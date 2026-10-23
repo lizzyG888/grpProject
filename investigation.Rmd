@@ -33,3 +33,7 @@ df = read.csv("data/SeoulBikeData.csv", fileEncoding = "latin1")
 ```
 
 
+```{r task1}
+
+
+```
