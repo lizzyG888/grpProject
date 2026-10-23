@@ -17,6 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r load-lib, message = FALSE}
 library(tidyverse)
 library(janitor)
+library(dbplyr)
 # Add any other libraries here
 
 
@@ -60,7 +61,24 @@ ggplot() +
 
 
 ```{r trial2}
+trialdf3 = df %>% select(-functioning_day, -holiday) %>% group_by(hour, seasons) %>% 
+  summarise(
+    mean_bike_count = mean(rented_bike_count, na.rm = TRUE)
+  )
 
+trialdf4 = df %>% select(-functioning_day, -holiday) %>% group_by(hour, seasons) %>% 
+  summarise(
+    mean_temperature = mean(temperature_c, na.rm = TRUE)
+  )
+trialdf5 <- inner_join(trialdf3, trialdf4, by = c("seasons", "hour")) 
+ggplot(data = trialdf5, 
+       mapping = aes(x = mean_bike_count, y = mean_temperature, colour = seasons)) +
+geom_point() + 
+  facet_wrap(~ seasons) +
+labs(title = "Correlation Between Temperature and Bike Demand",
+       x = "Mean Number of Bikes Demanded", 
+       y = "Mean Temperature (°C)",
+     colour= "Seasons")
 
 
 ```
