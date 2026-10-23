@@ -19,12 +19,13 @@ library(tidyverse)
 # Add any other libraries here
 
 
-
 ```
 
 
 ```{r load-data}
 # load your data 
+
+df <- read.csv("C:/Users/gohli/Desktop/SeoulBikeData.csv", fileEncoding = "latin1")
 
 
 
