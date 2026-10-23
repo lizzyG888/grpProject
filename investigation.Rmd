@@ -26,15 +26,49 @@ library(janitor)
 ```{r load-data}
 # load your data 
 
-
 df = read.csv("data/SeoulBikeData.csv", fileEncoding = "latin1") %>% clean_names()
+
+```
+
+
+```{r trial1}
+
+trialdf1 = df %>% select(-functioning_day, -holiday) %>% group_by(hour, seasons) %>% 
+  summarise(
+    Mean_Div_100 = mean(rented_bike_count, na.rm = TRUE)/100
+  )
+
+trialdf2 = df %>% select(-functioning_day, -holiday) %>% group_by(hour, seasons) %>% 
+  summarise(
+    m = mean(temperature_c, na.rm = TRUE)
+  )
+
+ggplot() +
+  geom_bar(data = trialdf1, aes(x = hour, y = Mean_Div_100, fill = "Mean Rented Bike Count (/100)"), stat = "identity", alpha = 0.7) +
+  geom_point(data = trialdf2, aes(x = hour, y = m, colour = "Mean Temperature (C)"), size = 2) +
+  facet_wrap(~ seasons) +
+  scale_fill_manual(name = NULL , values = c("Mean Rented Bike Count (/100)" = "lightblue")) +
+  scale_color_manual(name = "Key", values = c("Mean Temperature (C)" = "grey")) +
+  labs(
+    x = "Hour",
+    y = "Mean Rented Bike Count (/100), Mean Temperature (C)",
+    title = "Effect Temperature has on Rented Bike Count"
+  ) 
+
+
+```
+
+
+```{r trial2}
 
 
 
 ```
 
 
-```{r task1}
+
+```{r trial3}
+
 
 
 ```
