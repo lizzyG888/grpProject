@@ -16,6 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r load-lib, message = FALSE}
 library(tidyverse)
+library(janitor)
 # Add any other libraries here
 
 
@@ -26,7 +27,7 @@ library(tidyverse)
 # load your data 
 
 
-df = read.csv("data/SeoulBikeData.csv", fileEncoding = "latin1")
+df = read.csv("data/SeoulBikeData.csv", fileEncoding = "latin1") %>% clean_names()
 
 
 
