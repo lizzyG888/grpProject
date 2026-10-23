@@ -25,8 +25,8 @@ library(tidyverse)
 ```{r load-data}
 # load your data 
 
-df <- read.csv("C:/Users/gohli/Desktop/SeoulBikeData.csv", fileEncoding = "latin1")
 
+df = read.csv("data/SeoulBikeData.csv", fileEncoding = "latin1")
 
 
 
