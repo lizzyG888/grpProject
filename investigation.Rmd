@@ -31,7 +31,7 @@ df = read.csv("data/SeoulBikeData.csv", fileEncoding = "latin1") %>% clean_names
 ```{r summary data here}
 
 df %>% group_by(seasons) %>% summarise(mean_bike_count = mean(rented_bike_count, na.rm= TRUE))
-df %>% group_by(date) %>% summarise(mean_bike_count = mean(rented_bike_count, na.rm= TRUE))
+df %>% group_by(date = dmy(date)) %>% summarise(mean_bike_count = mean(rented_bike_count, na.rm= TRUE))
 df %>% group_by(hour) %>% summarise(mean_bike_count = mean(rented_bike_count, na.rm= TRUE))
 
 
