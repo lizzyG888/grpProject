@@ -34,8 +34,21 @@ df = read.csv("data/SeoulBikeData.csv", fileEncoding = "latin1") %>% clean_names
 
 ```{r summary data here}
 
+df %>% group_by(seasons) %>% summarise(mean_bike_count = mean(rented_bike_count, na.rm= TRUE))
+df %>% group_by(date) %>% summarise(mean_bike_count = mean(rented_bike_count, na.rm= TRUE))
+df %>% group_by(hour) %>% summarise(mean_bike_count = mean(rented_bike_count, na.rm= TRUE))
 
 
+df %>% mutate(
+  temp_grp = factor(case_when(
+    temperature_c <= -10 ~ "Extremely low",
+    temperature_c >= -10 & temperature_c < 0 ~ "Very low",
+    temperature_c >= 0 & temperature_c < 10 ~ "Low",
+    temperature_c >= 10 & temperature_c < 20 ~ "Mid",
+    temperature_c >= 20 & temperature_c < 30 ~ "High",
+    temperature_c >= 30 & temperature_c < 40 ~ "Very high",
+    TRUE ~ "Extremely high" 
+  ), level = c("Extremely low", "Very low", "Low", "Mid", "High", "Very high", "Extremely high"))) %>% group_by(temp_grp) %>% summarise(mean_bike_count = mean(rented_bike_count, na.rm= TRUE))
 
 
 ```
@@ -63,7 +76,7 @@ ggplot() +
   labs(
     x = "Hour",
     y = "Mean Rented Bike Count (/100), Mean Temperature (C)",
-    title = "Effect Temperature has on Rented Bike Count"
+    title = "Effect Temperature has on Rented Bike Count (by hours of the day)"
   ) 
 
 
