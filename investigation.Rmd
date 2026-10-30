@@ -32,6 +32,16 @@ df = read.csv("data/SeoulBikeData.csv", fileEncoding = "latin1") %>% clean_names
 ```
 
 
+```{r summary data here}
+
+
+
+
+
+```
+
+
+
 ```{r trial1}
 
 trialdf1 = df %>% select(-functioning_day, -holiday) %>% group_by(hour, seasons) %>% 
