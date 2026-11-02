@@ -16,6 +16,7 @@ library(tidyverse)
 library(janitor)
 library(dbplyr)
 library(lubridate)
+library(patchwork)
 # Add any other libraries here
 
 
@@ -104,11 +105,28 @@ trialdf6 <- df %>%
   select(date, rented_bike_count, temperature_c, seasons) %>%
   mutate(date = as.Date(date, format = "%d/%m/%Y")) %>%
   group_by(date) %>%
-  summarise(day_bike_count_div_1000 = sum(rented_bike_count)/1000, 
+  summarise(day_bike_count = sum(rented_bike_count), 
             mean_day_temp_c = mean(temperature_c))
 
-ggplot() +
-  geom_line(data = trialdf6, aes(x = date, y = day_bike_count_div_1000), stat = "identity") +
-  geom_point(data = trialdf6, aes(x = date, y = mean_day_temp_c))
+
+coeff <- 0.001
+
+ggplot(trialdf6, aes(x = date)) +
+  geom_point(aes(y = day_bike_count), colour = "tomato", size = 0.6) + 
+  geom_smooth(aes(y = day_bike_count), colour = "tomato", size = 0.6) +
+  geom_point(aes(y = mean_day_temp_c/ coeff), colour = "cornflowerblue", size = 0.6) +
+  geom_smooth(aes(y = mean_day_temp_c/ coeff), colour = "cornflowerblue", size = 0.6) +
+  labs(x = "Date",
+       title = "Correlation Between Number of Rented Bikes and Temperature") +
+  scale_y_continuous(
+    name = "Number of Rented Bikes",
+    sec.axis = sec_axis(~.*coeff, name="Temperature (in degrees celsius)")
+  )+
+  theme(
+    axis.title.y = element_text(color = "tomato", size=13),
+    axis.title.y.right = element_text(color = "cornflowerblue", size=13)
+  ) 
+
+trialdf6 %>% summarise(Correlation = cor(day_bike_count, mean_day_temp_c))
 
 ```
