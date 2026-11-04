@@ -101,6 +101,7 @@ labs(title = "Correlation Between Temperature and Bike Demand",
 ```
 
 ```{r trial3}
+#Correlation between Temperature and Bike Demand
 trialdf6 <- df %>% 
   select(date, rented_bike_count, temperature_c, seasons) %>%
   mutate(date = as.Date(date, format = "%d/%m/%Y")) %>%
@@ -129,4 +130,86 @@ ggplot(trialdf6, aes(x = date)) +
 
 trialdf6 %>% summarise(Correlation = cor(day_bike_count, mean_day_temp_c))
 
+```
+
+``` {r trial 4}
+#Correlation between Humidity and Bike Demand
+trialdf7 <- df %>% 
+  select(date, humidity, seasons, rented_bike_count) %>%
+  mutate(date = as.Date(date, format = "%d/%m/%Y")) %>%
+  group_by(date) %>%
+  summarise(day_bike_count = sum(rented_bike_count), 
+            mean_day_humidity = mean(humidity))
+
+
+coeff <- 0.001
+
+ggplot(trialdf7, aes(x = date)) +
+  geom_point(aes(y = day_bike_count), colour = "hotpink", size = 0.6) + 
+  geom_smooth(aes(y = day_bike_count), colour = "hotpink", size = 0.6) +
+  geom_point(aes(y = mean_day_humidity/ coeff), colour = "chartreuse4", size = 0.6) +
+  geom_smooth(aes(y = mean_day_humidity/ coeff), colour = "chartreuse4", size = 0.6) +
+  labs(x = "Date",
+       title = "Correlation Between Number of Rented Bikes and Mean Humidity") +
+  scale_y_continuous(
+    name = "Number of Rented Bikes",
+    sec.axis = sec_axis(~.*coeff, name="Humidity (%)")
+  )+
+  theme(
+    axis.title.y = element_text(color = "hotpink", size=13),
+    axis.title.y.right = element_text(color = "chartreuse4", size=13)
+  ) 
+
+trialdf7 %>% summarise(Correlation = cor(day_bike_count, mean_day_humidity))
+
+```
+
+```{r trial 5}
+#Correlation between Rainfall and Bike Demand
+trialdf8 <- df %>% 
+  select(date, rainfall_mm, seasons, rented_bike_count) %>%
+  mutate(date = as.Date(date, format = "%d/%m/%Y")) %>%
+  group_by(date) %>%
+  summarise(day_bike_count = sum(rented_bike_count), 
+            mean_day_rainfall = mean(rainfall_mm))
+
+
+coeff <- 0.001
+
+ggplot(trialdf8, aes(x = date)) +
+  geom_point(aes(y = day_bike_count), colour = "violetred", size = 0.6) + 
+  geom_smooth(aes(y = day_bike_count), colour = "violetred", size = 0.6) +
+  geom_point(aes(y = mean_day_rainfall/ coeff), colour = "royalblue4", size = 0.6) +
+  geom_smooth(aes(y = mean_day_rainfall/ coeff), colour = "royalblue4", size = 0.6) +
+  labs(x = "Date",
+       title = "Correlation Between Number of Rented Bikes and Mean Rainfall for a Day") +
+  scale_y_continuous(
+    name = "Number of Rented Bikes",
+    sec.axis = sec_axis(~.*coeff, name="Rainfall (mm)")
+  )+
+  theme(
+    axis.title.y = element_text(color = "violetred", size=13),
+    axis.title.y.right = element_text(color = "royalblue4", size=13)
+  ) 
+
+trialdf8 %>% summarise(Correlation = cor(day_bike_count, mean_day_rainfall))
+```
+
+```{r trial 6}
+#How Bike Demand varies across hours of the day in differen seasons
+trialdf9 <- df %>%
+  select(hour, date, rented_bike_count, seasons)%>%
+   group_by(hour, seasons)%>%
+   summarise(
+     mean_bikes_per_hour=mean(rented_bike_count)
+   )
+   
+ggplot(data = trialdf9, 
+       mapping = aes(x = hour, y = mean_bikes_per_hour, colour = seasons)) +
+geom_smooth(se = FALSE) + 
+  facet_wrap(~ seasons) +
+labs(title = "Bike Demand across Hours of the Day for each Season",
+       x = "Hour of the Day", 
+       y = "Mean Bike Demand",
+     colour= "Seasons")
 ```
