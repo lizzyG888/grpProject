@@ -182,7 +182,7 @@ trialdf8 <- df %>%
             mean_day_rainfall = mean(rainfall_mm))
 
 
-coeff <- 0.001
+coeff <- 0.005
 
 ggplot(trialdf8, aes(x = date)) +
   geom_point(aes(y = day_bike_count), colour = "violetred", size = 0.6) + 
@@ -314,4 +314,29 @@ ggplot() +
 
 
 
+```
+```{r trial 9}
+
+trialdf7 = trialdf7%>% mutate(
+  date = as.Date(date)
+) 
+trialdf14 = inner_join(trialdf7, trialdf6, by = c("day_bike_count", "date"))
+
+library(ggcube)
+library(geometry)
+
+ggplot( data= trialdf14,
+mapping = aes(x=day_bike_count, 
+      y=mean_day_temp_c, 
+      z=mean_day_humidity)) +
+  geom_surface_3d()+
+    labs(
+    x = "Mean Bike Count for a Day",
+    y = "Mean Temperature for a Day (c)",
+    z = "Mean Humidity for a Day (%)",
+    title = "Effect Temperature and Humidity on Rented Bike Count per Day"
+  ) + coord_3d(ratio = c(1, 0.75, 0.5)) +
+  geom_surface_3d(linewidth = 0.2) +
+  scale_fill_viridis_c() +
+  scale_color_viridis_c()
 ```
