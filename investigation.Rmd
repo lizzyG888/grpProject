@@ -1,6 +1,6 @@
 ---
 title: "IDS investigation worksheet"
-author: "TBD: Ella, Lizzy, Pari & Sixue Ren"
+author: "TBD: Ella, Lizzy & Pari"
 date: "`r Sys.Date()`"
 output: html_document
 ---
