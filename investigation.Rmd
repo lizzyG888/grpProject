@@ -225,14 +225,14 @@ labs(title = "Bike Demand across Hours of the Day for each Season",
 
 ```{r trial 7}
 
+#ignore ts its so ugly
 
-
-trialdf10 = df %>% select(-functioning_day, -holiday) %>% group_by(hour, seasons) %>% 
+trialdf10 = df %>% select(-functioning_day, -holiday) %>% mutate(date = as.Date(date, format = "%d/%m/%Y"), seasons = factor(seasons, levels = c("Winter", "Spring", "Summer", "Autumn"))) %>% group_by(date, seasons) %>% 
   summarise(
     Mean = mean(rented_bike_count, na.rm = TRUE)
   )
 
-trialdf11 = df %>% select(-functioning_day, -holiday) %>% group_by(hour, seasons) %>% 
+trialdf11 = df %>% select(-functioning_day, -holiday) %>% mutate(date = as.Date(date, format = "%d/%m/%Y"), seasons = factor(seasons, levels = c("Winter", "Spring", "Summer", "Autumn"))) %>% group_by(date, seasons) %>% 
   summarise(
     m = mean(temperature_c, na.rm = TRUE)
   )
@@ -240,26 +240,78 @@ trialdf11 = df %>% select(-functioning_day, -holiday) %>% group_by(hour, seasons
 coeff = 0.01
 
 ggplot() +
-  geom_point(data = trialdf10, aes(x = hour, y = Mean), stat = "identity", alpha = 0.7, colour = "plum") +
-  geom_smooth(data = trialdf10, aes(x = hour, y = Mean), colour = "plum", size = 0.6, se = FALSE) +
-  geom_point(data = trialdf11, aes(x = hour, y = m/coeff), size = 2, colour = "palevioletred") +
-  geom_smooth(data = trialdf11, aes(x = hour, y = m/coeff), colour = "palevioletred", size = 0.6, se = FALSE) +
-  facet_wrap(~ seasons) +
+  geom_point(data = trialdf10, aes(x = date, y = Mean, colour = seasons), stat = "identity", alpha = 0.3) +
+  geom_smooth(data = trialdf10, aes(x = date, y = Mean, colour = seasons), se = FALSE, alpha = 0.5) +
+  geom_point(data = trialdf11, aes(x = date, y = m/coeff, colour = seasons), size = 2, shape = 4, stroke = 1, alpha = 0.7) +
+  geom_smooth(data = trialdf11, aes(x = date, y = m/coeff, colour = seasons),  se = FALSE, linetype = "dashed") +
+  scale_colour_manual(
+  name = "Season",
+  values = c(
+    "Winter" = "plum",
+    "Spring" = "palevioletred",
+    "Summer" = "mediumpurple1",
+    "Autumn" = "hotpink2"
+  )
+)+
   scale_y_continuous(
     name = "Mean Rented Bike Count",
     sec.axis = sec_axis(~.*coeff, name="Mean Temperature (C)")
   )+
   theme(
-    axis.title.y = element_text(color = "plum", size=13),
-    axis.title.y.right = element_text(color = "palevioletred", size=13)
+    axis.title.y = element_text( size=13),
+    axis.title.y.right = element_text(size=13)
   ) +
   labs(
-    x = "Hour",
-    title = "Effect Temperature has on Rented Bike Count (by hours of the day)"
+    x = "Date",
+    title = "Effect Temperature has on Rented Bike Count per Day"
   ) 
 
 
 cor(trialdf10$Mean, trialdf11$m)
+
+
+```
+
+
+
+
+
+```{r trial 8}
+
+
+
+trialdf12 = df %>% select(-functioning_day, -holiday) %>% mutate(date = as.Date(date, format = "%d/%m/%Y"), seasons = factor(seasons, levels = c("Winter", "Spring", "Summer", "Autumn"))) %>% group_by(date, seasons) %>% 
+  summarise(
+    Mean = mean(rented_bike_count, na.rm = TRUE)
+  )
+
+trialdf13 = df %>% select(-functioning_day, -holiday) %>% mutate(date = as.Date(date, format = "%d/%m/%Y"), seasons = factor(seasons, levels = c("Winter", "Spring", "Summer", "Autumn"))) %>% group_by(date, seasons) %>% 
+  summarise(
+    m = mean(temperature_c, na.rm = TRUE)
+  )
+
+coeff = 0.005
+
+ggplot() +
+  geom_point(data = trialdf12, aes(x = date, y = Mean), stat = "identity", colour = "plum") +
+  geom_smooth(data = trialdf12, aes(x = date, y = Mean), se = FALSE, colour = "plum") +
+  geom_point(data = trialdf13, aes(x = date, y = m/coeff),colour = "palevioletred") +
+  geom_smooth(data = trialdf13, aes(x = date, y = m/coeff),se = FALSE,colour = "palevioletred") +
+  scale_y_continuous(
+    name = "Mean Rented Bike Count",
+    sec.axis = sec_axis(~.*coeff, name="Mean Temperature (C)")
+  )+
+  theme(
+    axis.title.y = element_text(colour = "plum", size=13),
+    axis.title.y.right = element_text(colour = "palevioletred", size=13)
+  ) +
+  
+  labs(
+    x = "Date",
+    title = "Effect Temperature has on Rented Bike Count per Day"
+  ) + 
+  facet_wrap(~ seasons, scales = "free_x") 
+
 
 
 ```
