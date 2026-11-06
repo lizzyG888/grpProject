@@ -17,6 +17,10 @@ library(janitor)
 library(dbplyr)
 library(lubridate)
 library(patchwork)
+library(ggcube)
+library(geometry)
+library(gganimate)
+library(plotly)
 # Add any other libraries here
 
 
@@ -340,3 +344,16 @@ mapping = aes(x=day_bike_count,
   scale_fill_viridis_c() +
   scale_color_viridis_c()
 ```
+
+
+```{r trial 10}
+
+
+
+
+```
+
+
+
+
+

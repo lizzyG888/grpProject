@@ -370,6 +370,10 @@ library(janitor)
 library(dbplyr)
 library(lubridate)
 library(patchwork)
+library(ggcube)
+library(geometry)
+library(gganimate)
+library(plotly)
 # Add any other libraries here</code></pre>
 <pre class="r"><code># load your data 
 
@@ -734,13 +738,8 @@ ggplot() +
 ) 
 trialdf14 = inner_join(trialdf7, trialdf6, by = c(&quot;day_bike_count&quot;, &quot;date&quot;))
 
-library(ggcube)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;ggcube&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:ggplot2&#39;:
-## 
-##     aes, element_rect</code></pre>
-<pre class="r"><code>library(geometry)
+library(ggcube)
+library(geometry)
 
 ggplot( data= trialdf14,
 mapping = aes(x=day_bike_count, 
