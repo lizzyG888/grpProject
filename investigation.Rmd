@@ -20,7 +20,6 @@ library(patchwork)
 library(ggcube)
 library(geometry)
 library(gganimate)
-library(plotly)
 # Add any other libraries here
 
 
@@ -347,11 +346,26 @@ mapping = aes(x=day_bike_count,
 
 
 ```{r trial 10}
-
-
-
+trialdf15 <- df%>% select(date, rented_bike_count, solar_radiation_mj_m2)%>% group_by(date) %>%
+  mutate(
+    hours_of_sunlight=sum(solar_radiation_mj_m2 > 0, na.rm = TRUE),
+      mean_bike_count= mean(rented_bike_count)) %>%
+  mutate(date = as.Date(date, format = "%d/%m/%Y"))
 
 ```
+
+``` {r trial 11}
+trialdf15%>% 
+ggplot( 
+       mapping = aes(x = hours_of_sunlight, y = mean_bike_count)) +
+      geom_point(colour = "gold") +
+      labs( x = "Hours of Sunlight",
+            y = "Mean Bike Count for a Day",
+            title = "Effect of Hours of Sunlight on Mean Bike Count for a Day") +
+  theme_bw()
+    
+```
+
 
 
 
