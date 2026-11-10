@@ -28,27 +28,46 @@ library(gganimate)
 ```{r load-data}
 # load your data 
 
-df = read.csv("data/SeoulBikeData.csv", fileEncoding = "latin1") %>% clean_names()
+df = read.csv("data/SeoulBikeData.csv", fileEncoding = "latin1") %>% clean_names() %>%
+  mutate(date = as.Date(date, format = "%d/%m/%Y"))
 
 ```
 
 ```{r summary data here}
 
-df %>% group_by(seasons) %>% summarise(mean_bike_count = mean(rented_bike_count, na.rm= TRUE))
-df %>% group_by(date = dmy(date)) %>% summarise(mean_bike_count = mean(rented_bike_count, na.rm= TRUE))
-df %>% group_by(hour) %>% summarise(mean_bike_count = mean(rented_bike_count, na.rm= TRUE))
+df_seasons_mean <- df %>% 
+  group_by(seasons) %>% 
+  summarise(mean_hourly_bike_count = mean(rented_bike_count, na.rm= TRUE))
+
+df_date_mean <- df %>% 
+  group_by(date) %>% 
+  summarise(mean_hourly_bike_count = mean(rented_bike_count, na.rm= TRUE))
+
+df_hour_mean <- df %>% 
+  group_by(hour) %>% 
+  summarise(mean_hourly_bike_count = mean(rented_bike_count, na.rm= TRUE))
 
 
-df %>% mutate(
-  temp_grp = factor(case_when(
-    temperature_c <= -10 ~ "Extremely low",
-    temperature_c >= -10 & temperature_c < 0 ~ "Very low",
-    temperature_c >= 0 & temperature_c < 10 ~ "Low",
-    temperature_c >= 10 & temperature_c < 20 ~ "Mid",
-    temperature_c >= 20 & temperature_c < 30 ~ "High",
-    temperature_c >= 30 & temperature_c < 40 ~ "Very high",
-    TRUE ~ "Extremely high" 
-  ), level = c("Extremely low", "Very low", "Low", "Mid", "High", "Very high", "Extremely high"))) %>% group_by(temp_grp) %>% summarise(mean_bike_count = mean(rented_bike_count, na.rm= TRUE))
+df_temp_mean <- df %>% 
+  mutate(temp_grp = factor(
+    case_when(
+      temperature_c <= -10 ~ "Extremely low",
+      temperature_c >= -10 & temperature_c < 0 ~ "Very low",
+      temperature_c >= 0 & temperature_c < 10 ~ "Low",
+      temperature_c >= 10 & temperature_c < 20 ~ "Mid",
+      temperature_c >= 20 & temperature_c < 30 ~ "High",
+      temperature_c >= 30 & temperature_c < 40 ~ "Very high",
+      TRUE ~ "Extremely high" 
+      ), 
+    level = c("Extremely low", 
+              "Very low", 
+              "Low", 
+              "Mid", 
+              "High", 
+              "Very high", 
+              "Extremely high"))) %>% 
+  group_by(temp_grp) %>% 
+  summarise(mean_bike_count = mean(rented_bike_count, na.rm= TRUE))
 
 
 ```
@@ -115,7 +134,6 @@ labs(title = "Correlation Between Temperature and Bike Demand",
 #Correlation between Temperature and Bike Demand
 trialdf6 <- df %>% 
   select(date, rented_bike_count, temperature_c, seasons) %>%
-  mutate(date = as.Date(date, format = "%d/%m/%Y")) %>%
   group_by(date) %>%
   summarise(day_bike_count = sum(rented_bike_count), 
             mean_day_temp_c = mean(temperature_c))
@@ -124,10 +142,14 @@ trialdf6 <- df %>%
 coeff <- 0.001
 
 ggplot(trialdf6, aes(x = date)) +
-  geom_point(aes(y = day_bike_count), colour = "tomato", size = 0.6) + 
-  geom_smooth(aes(y = day_bike_count), colour = "tomato", size = 0.6) +
-  geom_point(aes(y = mean_day_temp_c/ coeff), colour = "cornflowerblue", size = 0.6) +
-  geom_smooth(aes(y = mean_day_temp_c/ coeff), colour = "cornflowerblue", size = 0.6) +
+  geom_point(aes(y = day_bike_count), 
+             colour = "tomato", size = 0.6) + 
+  geom_smooth(aes(y = day_bike_count), 
+              colour = "tomato", linewidth = 0.6) +
+  geom_point(aes(y = mean_day_temp_c/ coeff), 
+             colour = "cornflowerblue", size = 0.6) +
+  geom_smooth(aes(y = mean_day_temp_c/ coeff), 
+              colour = "cornflowerblue", linewidth = 0.6) +
   labs(x = "Date",
        title = "Correlation Between Number of Rented Bikes and Temperature") +
   scale_y_continuous(
@@ -135,8 +157,8 @@ ggplot(trialdf6, aes(x = date)) +
     sec.axis = sec_axis(~.*coeff, name="Temperature (in degrees celsius)")
   )+
   theme(
-    axis.title.y = element_text(color = "tomato", size=13),
-    axis.title.y.right = element_text(color = "cornflowerblue", size=13)
+    axis.title.y = element_text(color = "tomato", size = 13),
+    axis.title.y.right = element_text(color = "cornflowerblue", size = 13)
   ) 
 
 trialdf6 %>% summarise(Correlation = cor(day_bike_count, mean_day_temp_c))
@@ -147,7 +169,6 @@ trialdf6 %>% summarise(Correlation = cor(day_bike_count, mean_day_temp_c))
 #Correlation between Humidity and Bike Demand
 trialdf7 <- df %>% 
   select(date, humidity, seasons, rented_bike_count) %>%
-  mutate(date = as.Date(date, format = "%d/%m/%Y")) %>%
   group_by(date) %>%
   summarise(day_bike_count = sum(rented_bike_count), 
             mean_day_humidity = mean(humidity))
@@ -175,17 +196,16 @@ trialdf7 %>% summarise(Correlation = cor(day_bike_count, mean_day_humidity))
 
 ```
 
+
 ```{r trial 5}
-#Correlation between Rainfall and Bike Demand
 trialdf8 <- df %>% 
   select(date, rainfall_mm, seasons, rented_bike_count) %>%
-  mutate(date = as.Date(date, format = "%d/%m/%Y")) %>%
   group_by(date) %>%
   summarise(day_bike_count = sum(rented_bike_count), 
             mean_day_rainfall = mean(rainfall_mm))
 
 
-coeff <- 0.005
+coeff <- 0.0001
 
 ggplot(trialdf8, aes(x = date)) +
   geom_point(aes(y = day_bike_count), colour = "violetred", size = 0.6) + 
@@ -205,6 +225,7 @@ ggplot(trialdf8, aes(x = date)) +
 
 trialdf8 %>% summarise(Correlation = cor(day_bike_count, mean_day_rainfall))
 ```
+
 
 ```{r trial 6}
 #How Bike Demand varies across hours of the day in differen seasons
@@ -367,7 +388,88 @@ ggplot(
 ```
 
 
+```{r trial 12}
+#rainfall vs hourly bike demand
+
+trialdf16 <- df %>% 
+  select(hour, rainfall_mm, seasons, rented_bike_count) %>%
+  group_by(seasons, hour) %>%
+  summarise(mean_hourly_bike_count = mean(rented_bike_count), 
+            mean_day_rainfall = mean(rainfall_mm))
 
 
+coeff <- 0.001
 
+ggplot(trialdf16, aes(x = hour)) +
+  geom_point(aes(y = mean_hourly_bike_count), 
+             colour = "violetred", 
+             size = 0.6) + 
+  geom_smooth(aes(y = mean_hourly_bike_count), 
+              colour = "violetred", 
+              size = 0.6) +
+  geom_point(aes(y = mean_day_rainfall/ coeff), 
+             colour = "royalblue4", 
+             size = 0.6) +
+  geom_smooth(aes(y = mean_day_rainfall/ coeff), 
+              colour = "royalblue4", 
+              size = 0.6) +
+  labs(x = "Hour of the day",
+       title = "Correlation Between Number of Rented Bikes and Mean Rainfall",
+       subtitle = "by hour") +
+  scale_y_continuous(
+    name = "Number of Rented Bikes",
+    sec.axis = sec_axis(~.*coeff, name="Rainfall (mm)")
+  )+
+  theme(
+    axis.title.y = element_text(color = "violetred", size=13),
+    axis.title.y.right = element_text(color = "royalblue4", size=13)
+  ) 
+
+trialdf16 %>% summarise(Correlation = cor(mean_hourly_bike_count, mean_day_rainfall))
+
+
+```
+
+```{r trial 13}
+
+trialdf17 <- df %>% 
+  select(date, rainfall_mm, seasons, rented_bike_count) %>%
+  group_by(date) %>%
+  summarise(day_bike_count = sum(rented_bike_count), 
+            max_day_rainfall = max(rainfall_mm))
+
+
+coeff <- 0.001
+
+ggplot(trialdf17, aes(x = date)) +
+  geom_point(aes(y = day_bike_count), colour = "violetred", size = 0.6) + 
+  geom_smooth(aes(y = day_bike_count), colour = "violetred", size = 0.6) +
+  geom_point(aes(y = max_day_rainfall/ coeff), colour = "royalblue4", size = 0.6) +
+  geom_smooth(aes(y = max_day_rainfall/ coeff), colour = "royalblue4", size = 0.6) +
+  labs(x = "Date",
+       title = "Rented Bikes vs Maximum Hourly Rainfall",
+       subtitle = "by day") +
+  scale_y_continuous(
+    name = "Number of Rented Bikes",
+    sec.axis = sec_axis(~.*coeff, name="Maximum Rainfall (mm)")
+  )+
+  theme(
+    axis.title.y = element_text(color = "violetred", size=13),
+    axis.title.y.right = element_text(color = "royalblue4", size=13)
+  ) 
+
+trialdf17 %>% summarise(Correlation = cor(day_bike_count, max_day_rainfall))
+```
+
+
+```{r trial 14}
+#temperature bar chart
+
+ggplot(data = df_temp_mean, aes(x = temp_grp, y = mean_bike_count, fill = "salmon" ))+
+  geom_col()+
+  theme_bw()+
+  labs(x = "Temperature group", 
+       y = "Number of Rented Bikes")+
+  theme(legend.position = "none")
+```
 
