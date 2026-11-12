@@ -13,6 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r load-lib, message = FALSE}
 library(tidyverse)
+library(tidymodels)
 library(janitor)
 library(dbplyr)
 library(lubridate)
@@ -20,6 +21,7 @@ library(patchwork)
 library(ggcube)
 library(geometry)
 library(gganimate)
+library(plotly)
 # Add any other libraries here
 
 
@@ -296,10 +298,6 @@ cor(trialdf10$Mean, trialdf11$m)
 
 ```
 
-
-
-
-
 ```{r trial 8}
 
 
@@ -473,3 +471,98 @@ ggplot(data = df_temp_mean, aes(x = temp_grp, y = mean_bike_count, fill = "salmo
   theme(legend.position = "none")
 ```
 
+```{r trial 15 - model 1}
+ggplot(data = trialdf14,
+       mapping = aes(x = mean_day_temp_c, y = day_bike_count))+
+  geom_point(colour = "lightblue") +
+  geom_smooth(method = "lm", colour = "orange", se = FALSE)+
+  labs(
+    y ="daily bike count",
+    x ="mean daily temperature (c)",
+    title = "Linear relationship between daily bike demand and temperature"
+  )+
+  theme_bw()
+
+linear_reg()%>%
+  set_engine("lm") %>%
+   fit(day_bike_count ~ mean_day_temp_c, data = trialdf14) %>%
+  tidy()
+```
+
+```{r trial 16 - model 1 assessment}
+bike_temp_fit <- linear_reg() %>% 
+  set_engine("lm") %>%
+   fit(day_bike_count ~ mean_day_temp_c, data = trialdf14)
+
+ bike_temp_fit_aug <- augment(bike_temp_fit$fit)
+
+ggplot(bike_temp_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted bike demand", y = "Residuals", title = "Residuals for Predicted Bike Demand from Mean Daily Temperature") +
+  theme_bw()
+
+glance(bike_temp_fit)
+```
+Comments about model1:
+from graph linear relationship appears weak
+from residual plot we can see as predicted bike demand increases the residuals increase as well which is a pattern meaning the model is not a good fit
+residuals are quite significant, upto almost -20,000 meaning the accuracy is low
+from the glance function, r squared is 0.488 which is 48.8% so mean temperature explains 48.8% of variance in the daily bike demand which is decent for the model.
+formula for expected bike demand: daily bike demand = 8906.84 + 621.26 ✕ mean daily temp
+intercept is 8906.84 which is the expected demand for when mean daily temperature is 0, it is not exactly possible as bike demand cannot be in decimals but an approximate demand of 8907 is possible.
+the slope is 621.26 which means on average as the mean daily temperature increases by one degree celsius, we expect the demand of bikes for that day to increase by 621.26. Again while it is not possible to have an increase in bikes in decimals, an approximate increase of 621 is possible. 
+Overall, this model is not a good fit as we cannot accurately estimate the expected bike demand for a day due to the pattern seen in the residuals. But, we can say temperature has a significant influence on bike demand as it explains almost 50% of the variation seen in bike demand.
+
+```{r trial 17 - model 2}
+ggplot(data = trialdf14,
+       mapping = aes(x = mean_day_temp_c, y = mean_day_humidity, z = day_bike_count))+
+  geom_point_3d(colour = "lightblue") +
+  labs(
+    y ="mean daily humidity (%)",
+    x ="mean daily temperature (c)",
+    z = "daily bike count",
+    title = "Linear relationship between daily bike demand, mean daily humidity and mean daily temperature"
+  )+
+  theme_bw() + coord_3d()
+
+linear_reg()%>%
+  set_engine("lm") %>%
+   fit(day_bike_count ~ mean_day_humidity, data = trialdf14) %>%
+  tidy()
+
+linear_reg()%>%
+  set_engine("lm") %>%
+   fit(day_bike_count ~ mean_day_temp_c, data = trialdf14) %>%
+  tidy()
+
+linear_reg()%>%
+  set_engine("lm") %>%
+   fit(day_bike_count ~ mean_day_humidity + mean_day_temp_c, data = trialdf14) %>%
+  tidy()
+```
+
+```{r trial 18 - model 2 assessment}
+bike_temp_humid_fit <- linear_reg() %>% 
+  set_engine("lm") %>%
+   fit(day_bike_count ~ mean_day_humidity + mean_day_temp_c, data = trialdf14)
+
+ bike_temp_humid_fit_aug <- augment(bike_temp_humid_fit$fit)
+
+ggplot(bike_temp_humid_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted bike demand", y = "Residuals", title = "Residuals for Predicted Bike Demand from Mean Daily Temperature and Mean Daily Humidity") +
+  theme_bw()
+
+glance(bike_temp_humid_fit)
+```
+Comments about model2:
+from graph linear relationship appears weak
+from residual plot we can see as predicted bike demand increases the residuals increase as well which is a pattern meaning the model is not a good fit
+residuals are quite significant, upto almost -20,000 meaning the accuracy is low
+from the glance function, r squared is 0.488 which is 48.8% so mean temperature explains 48.8% of variance in the daily bike demand which is decent for the model.
+formula for expected bike demand: daily bike demand = 8906.84 + 621.26 ✕ mean daily temp
+intercept is 8906.84 which is the expected demand for when mean daily temperature is 0, it is not exactly possible as bike demand cannot be in decimals but an approximate demand of 8907 is possible.
+the slope is 621.26 which means on average as the mean daily temperature increases by one degree celsius, we expect the demand of bikes for that day to increase by 621.26. Again while it is not possible to have an increase in bikes in decimals, an approximate increase of 621 is possible. 
+Overall, this model is not a good fit as we cannot accurately estimate the expected bike demand for a day due to the pattern seen in the residuals. But, we can say temperature has a significant influence on bike demand as it explains almost 50% of the variation seen in bike demand.
