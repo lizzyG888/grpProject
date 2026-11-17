@@ -365,11 +365,13 @@ mapping = aes(x=day_bike_count,
 
 
 ```{r trial 10}
-trialdf15 <- df%>% select(date, rented_bike_count, solar_radiation_mj_m2)%>% group_by(date) %>%
+trialdf15 <- df%>% 
+  select(date, rented_bike_count, solar_radiation_mj_m2)%>% 
+  group_by(date) %>%
   mutate(
     hours_of_sunlight=sum(solar_radiation_mj_m2 > 0, na.rm = TRUE),
-      mean_bike_count= mean(rented_bike_count)) %>%
-  mutate(date = as.Date(date, format = "%d/%m/%Y"))
+      mean_bike_count= mean(rented_bike_count))
+
 
 ```
 
@@ -377,7 +379,7 @@ trialdf15 <- df%>% select(date, rented_bike_count, solar_radiation_mj_m2)%>% gro
 trialdf15%>% 
 ggplot( 
        mapping = aes(x = hours_of_sunlight, y = mean_bike_count)) +
-      geom_point(colour = "gold") +
+      geom_point(alpha = 0.5, colour = "gold") +
       labs( x = "Hours of Sunlight",
             y = "Mean Bike Count for a Day",
             title = "Effect of Hours of Sunlight on Mean Bike Count for a Day") +
@@ -467,7 +469,8 @@ ggplot(data = df_temp_mean, aes(x = temp_grp, y = mean_bike_count, fill = "salmo
   geom_col()+
   theme_bw()+
   labs(x = "Temperature group", 
-       y = "Number of Rented Bikes")+
+       y = "Number of Rented Bikes", 
+       title = "Rented bike count by temperature group")+
   theme(legend.position = "none")
 ```
 
@@ -566,3 +569,41 @@ formula for expected bike demand: daily bike demand = 8906.84 + 621.26 ✕ mean 
 intercept is 8906.84 which is the expected demand for when mean daily temperature is 0, it is not exactly possible as bike demand cannot be in decimals but an approximate demand of 8907 is possible.
 the slope is 621.26 which means on average as the mean daily temperature increases by one degree celsius, we expect the demand of bikes for that day to increase by 621.26. Again while it is not possible to have an increase in bikes in decimals, an approximate increase of 621 is possible. 
 Overall, this model is not a good fit as we cannot accurately estimate the expected bike demand for a day due to the pattern seen in the residuals. But, we can say temperature has a significant influence on bike demand as it explains almost 50% of the variation seen in bike demand.
+
+```{r trial 19 - model 3}
+bike_sun_df <- trialdf15 %>%
+  group_by(date, hours_of_sunlight) %>%
+  summarise(day_bike_count = sum(rented_bike_count))
+
+bike_sun_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(day_bike_count ~ hours_of_sunlight, data = bike_sun_df)
+  
+tidy(bike_sun_fit)
+
+
+ggplot(data = bike_sun_df, mapping = aes(x = hours_of_sunlight, y = day_bike_count)) +
+  geom_jitter(alpha = 0.5, colour = "gold") +
+geom_smooth(method = "lm", colour = "skyblue", se = FALSE) +
+  labs( x = "Hours of Sunlight",
+        y = "Total Bike Count for a Day",
+        title = "Linear model for daily bike count from hours of sunlight") +
+  theme_bw()
+```
+```{r trial 20 - model 3 assessment}
+ bike_sun_aug <- augment(bike_sun_fit$fit)
+
+ggplot(bike_temp_humid_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted bike demand", y = "Residuals", title = "Residuals for Predicted Bike Demand from Sunlight hours") +
+  theme_bw()
+
+glance(bike_sun_fit)
+
+```
+
+formula : bikedemand = -25386.97 + 3461.56*sunlighthours
+The formula for this linear model tells us that, on average, for every hour increase in sunlight in a day, the total bike demand increases by 3461.56 for that day. The decimals are not possible, however we can round this up for the model to give a reasonable predicted on change in bike demand with sunlight hours.
+On the other hand, the model predicts a value of -25386.97 for bike demand when there are 0 hours of sunlight in a day, which is not possible and tells us the model may not be suitable.
+The adjusted R^2 value for this model tells us that around 47% of the variability in response is explained by the linear model.
