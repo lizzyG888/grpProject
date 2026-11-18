@@ -134,6 +134,9 @@ labs(title = "Correlation Between Temperature and Bike Demand",
 
 ```{r trial3}
 #Correlation between Temperature and Bike Demand
+
+#Lizzy in report
+
 trialdf6 <- df %>% 
   select(date, rented_bike_count, temperature_c, seasons) %>%
   group_by(date) %>%
@@ -300,7 +303,7 @@ cor(trialdf10$Mean, trialdf11$m)
 
 ```{r trial 8}
 
-
+#Lizzy in report
 
 trialdf12 = df %>% select(-functioning_day, -holiday) %>% mutate(date = as.Date(date, format = "%d/%m/%Y"), seasons = factor(seasons, levels = c("Winter", "Spring", "Summer", "Autumn"))) %>% group_by(date, seasons) %>% 
   summarise(
