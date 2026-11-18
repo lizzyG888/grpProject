@@ -315,7 +315,7 @@ trialdf13 = df %>% select(-functioning_day, -holiday) %>% mutate(date = as.Date(
     m = mean(temperature_c, na.rm = TRUE)
   )
 
-coeff = 0.005
+coeff = 0.025
 
 ggplot() +
   geom_point(data = trialdf12, aes(x = date, y = Mean), stat = "identity", colour = "plum") +
