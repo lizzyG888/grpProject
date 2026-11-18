@@ -610,3 +610,83 @@ formula : bikedemand = -25386.97 + 3461.56*sunlighthours
 The formula for this linear model tells us that, on average, for every hour increase in sunlight in a day, the total bike demand increases by 3461.56 for that day. The decimals are not possible, however we can round this up for the model to give a reasonable predicted on change in bike demand with sunlight hours.
 On the other hand, the model predicts a value of -25386.97 for bike demand when there are 0 hours of sunlight in a day, which is not possible and tells us the model may not be suitable.
 The adjusted R^2 value for this model tells us that around 47% of the variability in response is explained by the linear model.
+
+
+
+```{r }
+
+df_bike_cat <- df %>% 
+  mutate(bike_grp = factor(
+    case_when(
+      rented_bike_count <= 400 ~ "0-400",
+      rented_bike_count <= 800 ~ "401-800",
+      rented_bike_count <= 1200 ~ "801-1200",
+      rented_bike_count <= 1600 ~ "1201-1600",
+      rented_bike_count <= 2000 ~ "1601-2000",
+      rented_bike_count <= 2400 ~ "2001-2400",
+      rented_bike_count > 2400 ~ "Greater than 2400"
+    ),
+    levels = c("0-400",
+               "401-800",
+               "801-1200",
+               "1201-1600",
+               "1601-2000",
+               "2001-2400",
+               "Greater than 2400"),
+    ordered = TRUE
+  ))
+
+set.seed(1234)
+
+bike_split <- initial_split(df_bike_cat)
+bike_train <- training(bike_split)
+bike_test <- testing(bike_split)
+
+bike_rec <- recipe(bike_grp ~ temperature_c, 
+                   data = bike_train)
+
+bike_mod <- multinom_reg() %>% 
+  set_engine("nnet") 
+
+bike_wflow <- workflow() %>% 
+  add_model(bike_mod) %>% 
+  add_recipe(bike_rec)
+
+bike_fit <- bike_wflow %>% 
+  fit(data = bike_train)
+
+bike_pred <- predict(bike_fit, bike_test, type = "prob") %>% 
+  bind_cols(predict(bike_fit, bike_test, type = "class")) %>%
+  bind_cols(bike_test %>% select(bike_grp, temperature_c))
+
+
+bike_pred %>%
+  roc_auc(
+    truth = bike_grp,
+    `.pred_0-400`,
+    `.pred_401-800`,
+    `.pred_801-1200`,
+    `.pred_1201-1600`,
+    `.pred_1601-2000`,
+    `.pred_2001-2400`,
+    `.pred_Greater than 2400`,
+    estimator = "hand_till"
+  )
+
+bike_pred %>%
+  roc_curve(
+    truth = bike_grp,
+    `.pred_0-400`,
+    `.pred_401-800`,
+    `.pred_801-1200`,
+    `.pred_1201-1600`,
+    `.pred_1601-2000`,
+    `.pred_2001-2400`,
+    `.pred_Greater than 2400`,
+    estimator = "hand_till"
+  ) %>%
+  autoplot()
+
+
+
+```
