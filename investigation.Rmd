@@ -36,7 +36,6 @@ df = read.csv("data/SeoulBikeData.csv", fileEncoding = "latin1") %>% clean_names
 ```
 
 ```{r summary data here}
-
 df_seasons_mean <- df %>% 
   group_by(seasons) %>% 
   summarise(mean_hourly_bike_count = mean(rented_bike_count, na.rm= TRUE))
@@ -71,12 +70,11 @@ df_temp_mean <- df %>%
   group_by(temp_grp) %>% 
   summarise(mean_bike_count = mean(rented_bike_count, na.rm= TRUE))
 
-
 ```
 
 ```{r trial1}
 
-
+#dont include
 trialdf1 = df %>% select(-functioning_day, -holiday) %>% group_by(hour, seasons) %>% 
   summarise(
     Mean = mean(rented_bike_count, na.rm = TRUE)
@@ -110,6 +108,7 @@ ggplot() +
 ```
 
 ```{r trial2}
+#dont include
 trialdf3 = df %>% select(-functioning_day, -holiday) %>% group_by(hour, seasons) %>% 
   summarise(
     mean_bike_count = mean(rented_bike_count, na.rm = TRUE)
@@ -133,6 +132,7 @@ labs(title = "Correlation Between Temperature and Bike Demand",
 ```
 
 ```{r trial3}
+#added to report
 #Correlation between Temperature and Bike Demand
 trialdf6 <- df %>% 
   select(date, rented_bike_count, temperature_c, seasons) %>%
@@ -168,6 +168,8 @@ trialdf6 %>% summarise(Correlation = cor(day_bike_count, mean_day_temp_c))
 ```
 
 ``` {r trial 4}
+#INCLUDE
+
 #Correlation between Humidity and Bike Demand
 trialdf7 <- df %>% 
   select(date, humidity, seasons, rented_bike_count) %>%
@@ -200,6 +202,7 @@ trialdf7 %>% summarise(Correlation = cor(day_bike_count, mean_day_humidity))
 
 
 ```{r trial 5}
+#INCLUDE
 trialdf8 <- df %>% 
   select(date, rainfall_mm, seasons, rented_bike_count) %>%
   group_by(date) %>%
@@ -226,10 +229,13 @@ ggplot(trialdf8, aes(x = date)) +
   ) 
 
 trialdf8 %>% summarise(Correlation = cor(day_bike_count, mean_day_rainfall))
+
 ```
 
 
 ```{r trial 6}
+#dont include
+
 #How Bike Demand varies across hours of the day in differen seasons
 trialdf9 <- df %>%
   select(hour, date, rented_bike_count, seasons)%>%
@@ -251,7 +257,7 @@ labs(title = "Bike Demand across Hours of the Day for each Season",
 
 ```{r trial 7}
 
-#ignore ts its so ugly
+#dont include
 
 trialdf10 = df %>% select(-functioning_day, -holiday) %>% mutate(date = as.Date(date, format = "%d/%m/%Y"), seasons = factor(seasons, levels = c("Winter", "Spring", "Summer", "Autumn"))) %>% group_by(date, seasons) %>% 
   summarise(
@@ -300,7 +306,7 @@ cor(trialdf10$Mean, trialdf11$m)
 
 ```{r trial 8}
 
-
+#already included
 
 trialdf12 = df %>% select(-functioning_day, -holiday) %>% mutate(date = as.Date(date, format = "%d/%m/%Y"), seasons = factor(seasons, levels = c("Winter", "Spring", "Summer", "Autumn"))) %>% group_by(date, seasons) %>% 
   summarise(
@@ -338,6 +344,7 @@ ggplot() +
 
 ```
 ```{r trial 9}
+#dont include
 
 trialdf7 = trialdf7%>% mutate(
   date = as.Date(date)
@@ -365,6 +372,7 @@ mapping = aes(x=day_bike_count,
 
 
 ```{r trial 10}
+#dont include
 trialdf15 <- df%>% select(date, rented_bike_count, solar_radiation_mj_m2)%>% group_by(date) %>%
   mutate(
     hours_of_sunlight=sum(solar_radiation_mj_m2 > 0, na.rm = TRUE),
@@ -374,6 +382,7 @@ trialdf15 <- df%>% select(date, rented_bike_count, solar_radiation_mj_m2)%>% gro
 ```
 
 ``` {r trial 11}
+#dont include
 trialdf15%>% 
 ggplot( 
        mapping = aes(x = hours_of_sunlight, y = mean_bike_count)) +
@@ -387,6 +396,8 @@ ggplot(
 
 
 ```{r trial 12}
+#dont include
+
 #rainfall vs hourly bike demand
 
 trialdf16 <- df %>% 
@@ -425,10 +436,10 @@ ggplot(trialdf16, aes(x = hour)) +
 
 trialdf16 %>% summarise(Correlation = cor(mean_hourly_bike_count, mean_day_rainfall))
 
-
 ```
 
 ```{r trial 13}
+#dont include
 
 trialdf17 <- df %>% 
   select(date, rainfall_mm, seasons, rented_bike_count) %>%
@@ -461,6 +472,8 @@ trialdf17 %>% summarise(Correlation = cor(day_bike_count, max_day_rainfall))
 
 
 ```{r trial 14}
+#INCLUDE
+
 #temperature bar chart
 
 ggplot(data = df_temp_mean, aes(x = temp_grp, y = mean_bike_count, fill = "salmon" ))+
@@ -472,16 +485,7 @@ ggplot(data = df_temp_mean, aes(x = temp_grp, y = mean_bike_count, fill = "salmo
 ```
 
 ```{r trial 15 - model 1}
-ggplot(data = trialdf14,
-       mapping = aes(x = mean_day_temp_c, y = day_bike_count))+
-  geom_point(colour = "lightblue") +
-  geom_smooth(method = "lm", colour = "orange", se = FALSE)+
-  labs(
-    y ="daily bike count",
-    x ="mean daily temperature (c)",
-    title = "Linear relationship between daily bike demand and temperature"
-  )+
-  theme_bw()
+#(MODEL-TEMPERATURE)
 
 linear_reg()%>%
   set_engine("lm") %>%
@@ -490,6 +494,7 @@ linear_reg()%>%
 ```
 
 ```{r trial 16 - model 1 assessment}
+#(MODEL- TEMPERATURE)
 bike_temp_fit <- linear_reg() %>% 
   set_engine("lm") %>%
    fit(day_bike_count ~ mean_day_temp_c, data = trialdf14)
@@ -515,54 +520,72 @@ the slope is 621.26 which means on average as the mean daily temperature increas
 Overall, this model is not a good fit as we cannot accurately estimate the expected bike demand for a day due to the pattern seen in the residuals. But, we can say temperature has a significant influence on bike demand as it explains almost 50% of the variation seen in bike demand.
 
 ```{r trial 17 - model 2}
-ggplot(data = trialdf14,
-       mapping = aes(x = mean_day_temp_c, y = mean_day_humidity, z = day_bike_count))+
-  geom_point_3d(colour = "lightblue") +
-  labs(
-    y ="mean daily humidity (%)",
-    x ="mean daily temperature (c)",
-    z = "daily bike count",
-    title = "Linear relationship between daily bike demand, mean daily humidity and mean daily temperature"
-  )+
-  theme_bw() + coord_3d()
-
+#INCLUDE (model-all)
+trialdf18 <- left_join(trialdf14, trialdf8, by = c("date", "day_bike_count"))
+  
 linear_reg()%>%
   set_engine("lm") %>%
-   fit(day_bike_count ~ mean_day_humidity, data = trialdf14) %>%
+   fit(day_bike_count ~ mean_day_humidity, data = trialdf18) %>%
   tidy()
 
 linear_reg()%>%
   set_engine("lm") %>%
-   fit(day_bike_count ~ mean_day_temp_c, data = trialdf14) %>%
+   fit(day_bike_count ~ mean_day_temp_c, data = trialdf18) %>%
   tidy()
 
 linear_reg()%>%
   set_engine("lm") %>%
-   fit(day_bike_count ~ mean_day_humidity + mean_day_temp_c, data = trialdf14) %>%
+   fit(day_bike_count ~ mean_day_rainfall, data = trialdf18) %>%
+  tidy()
+
+linear_reg()%>%
+  set_engine("lm") %>%
+   fit(day_bike_count ~ mean_day_humidity + mean_day_temp_c + mean_day_rainfall, data = trialdf18) %>%
   tidy()
 ```
 
 ```{r trial 18 - model 2 assessment}
-bike_temp_humid_fit <- linear_reg() %>% 
+#INCLUDE (MODEL - all)
+bike_temp_humid_rain_fit <- linear_reg() %>% 
   set_engine("lm") %>%
-   fit(day_bike_count ~ mean_day_humidity + mean_day_temp_c, data = trialdf14)
+   fit(day_bike_count ~ mean_day_humidity + mean_day_temp_c + mean_day_rainfall, data = trialdf18)
 
- bike_temp_humid_fit_aug <- augment(bike_temp_humid_fit$fit)
+ bike_temp_humid_rain_fit_aug <- augment(bike_temp_humid_rain_fit$fit)
 
-ggplot(bike_temp_humid_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+ggplot(bike_temp_humid_rain_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
   geom_point(alpha = 0.5) +
   geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
-  labs(x = "Predicted bike demand", y = "Residuals", title = "Residuals for Predicted Bike Demand from Mean Daily Temperature and Mean Daily Humidity") +
+  labs(x = "Predicted bike demand", y = "Residuals", title = "Residuals for Predicted Bike Demand from Mean Daily Temperature, Mean Daily Humidity, and Mean Daily Rainfall") +
   theme_bw()
 
-glance(bike_temp_humid_fit)
+glance(bike_temp_humid_rain_fit)
 ```
-Comments about model2:
-from graph linear relationship appears weak
-from residual plot we can see as predicted bike demand increases the residuals increase as well which is a pattern meaning the model is not a good fit
+Comments about model:
+from graph linear relationship appears strong
+from residual plot we can see as predicted bike demand increases the residuals increase as well which is a pattern meaning the model is not a good fit, additionally they are not randomly scattered around 0.
 residuals are quite significant, upto almost -20,000 meaning the accuracy is low
-from the glance function, r squared is 0.488 which is 48.8% so mean temperature explains 48.8% of variance in the daily bike demand which is decent for the model.
-formula for expected bike demand: daily bike demand = 8906.84 + 621.26 ✕ mean daily temp
-intercept is 8906.84 which is the expected demand for when mean daily temperature is 0, it is not exactly possible as bike demand cannot be in decimals but an approximate demand of 8907 is possible.
-the slope is 621.26 which means on average as the mean daily temperature increases by one degree celsius, we expect the demand of bikes for that day to increase by 621.26. Again while it is not possible to have an increase in bikes in decimals, an approximate increase of 621 is possible. 
-Overall, this model is not a good fit as we cannot accurately estimate the expected bike demand for a day due to the pattern seen in the residuals. But, we can say temperature has a significant influence on bike demand as it explains almost 50% of the variation seen in bike demand.
+from the glance function, r squared is 0.606 which is 60.6% so mean temperature, mean humidity and mean rainfall explain 60.6% of variance in the daily bike demand which is decent for the model.
+formula for expected bike demand: daily bike demand = 15315.83 + 710.49 ✕ mean daily temp - 117.2 ✕ mean daily humidity - 4937.78 ✕ mean daily rainfall
+intercept is 15315.83 which is the expected demand for when mean daily temperature and mean daily humidity are 0, it is not exactly possible as bike demand cannot be in decimals but an approximate demand of 15316 is possible.
+the slope of mean daily temperature is 710.49 which means on average as the mean daily temperature increases by one degree celsius, we expect the demand of bikes for that day to increase by 710.49 Again while it is not possible to have an increase in bikes in decimals, an approximate increase of 710 is possible.
+the slope of mean daily humidity is -117.2 which means on average as the mean daily humidity increases by one percent, we expect the demand of bikes for that day to decrease by 117.2 Again while it is not possible to have a decrease in bikes in decimals, an approximate decrease of 117 is possible.
+the slope of mean daily rainfall is 4937.78 which means on average as the mean daily rainfall increases by one percent, we expect the demand of bikes for that day to decrease by 4937.78. Again while it is not possible to have a decrease in bikes in decimals, an approximate increase of 4938 is possible.
+Overall, this model is not a good fit as we cannot accurately estimate the expected bike demand for a day due to the pattern seen in the residuals. But, we can say temperature, humidity and rainfall have a significant influence on bike demand as it explains almost 61% of the variation seen in bike demand.
+
+
+```{r trial 19 - model 3 }
+ #(MODEL - HUMIDITY)
+bike_humid_fit <- linear_reg() %>% 
+  set_engine("lm") %>%
+   fit(day_bike_count ~ mean_day_humidity, data = trialdf14)
+
+ bike_humid_fit_aug <- augment(bike_humid_fit$fit)
+
+ggplot(bike_humid_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted bike demand", y = "Residuals", title = "Residuals for Predicted Bike Demand from Mean Daily Humidity") +
+  theme_bw()
+
+glance(bike_humid_fit)
+```
