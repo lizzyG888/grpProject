@@ -149,11 +149,11 @@ coeff <- 0.001
 ggplot(trialdf6, aes(x = date)) +
   geom_point(aes(y = day_bike_count), 
              colour = "tomato", size = 0.6) + 
-  geom_smooth(aes(y = day_bike_count), 
+  geom_smooth(aes(y = day_bike_count), se = FALSE, 
               colour = "tomato", linewidth = 0.6) +
   geom_point(aes(y = mean_day_temp_c/ coeff), 
              colour = "cornflowerblue", size = 0.6) +
-  geom_smooth(aes(y = mean_day_temp_c/ coeff), 
+  geom_smooth(aes(y = mean_day_temp_c/ coeff), se = FALSE, 
               colour = "cornflowerblue", linewidth = 0.6) +
   labs(x = "Date",
        title = "Correlation Between Number of Rented Bikes and Temperature") +
@@ -185,9 +185,9 @@ coeff <- 0.001
 
 ggplot(trialdf7, aes(x = date)) +
   geom_point(aes(y = day_bike_count), colour = "hotpink", size = 0.6) + 
-  geom_smooth(aes(y = day_bike_count), colour = "hotpink", size = 0.6) +
+  geom_smooth(aes(y = day_bike_count), se = FALSE, colour = "hotpink", size = 0.6) +
   geom_point(aes(y = mean_day_humidity/ coeff), colour = "chartreuse4", size = 0.6) +
-  geom_smooth(aes(y = mean_day_humidity/ coeff), colour = "chartreuse4", size = 0.6) +
+  geom_smooth(aes(y = mean_day_humidity/ coeff), se = FALSE, colour = "chartreuse4", size = 0.6) +
   labs(x = "Date",
        title = "Correlation Between Number of Rented Bikes and Mean Humidity") +
   scale_y_continuous(
@@ -217,9 +217,9 @@ coeff <- 0.0001
 
 ggplot(trialdf8, aes(x = date)) +
   geom_point(aes(y = day_bike_count), colour = "violetred", size = 0.6) + 
-  geom_smooth(aes(y = day_bike_count), colour = "violetred", size = 0.6) +
+  geom_smooth(aes(y = day_bike_count), se = FALSE, colour = "violetred", size = 0.6) +
   geom_point(aes(y = mean_day_rainfall/ coeff), colour = "royalblue4", size = 0.6) +
-  geom_smooth(aes(y = mean_day_rainfall/ coeff), colour = "royalblue4", size = 0.6) +
+  geom_smooth(aes(y = mean_day_rainfall/ coeff), se = FALSE, colour = "royalblue4", size = 0.6) +
   labs(x = "Date",
        title = "Correlation Between Number of Rented Bikes and Mean Rainfall for a Day") +
   scale_y_continuous(
