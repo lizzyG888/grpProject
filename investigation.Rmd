@@ -539,14 +539,10 @@ linear_reg()%>%
    fit(day_bike_count ~ mean_day_temp_c, data = trialdf18) %>%
   tidy()
 
-linear_reg()%>%
-  set_engine("lm") %>%
-   fit(day_bike_count ~ mean_day_rainfall, data = trialdf18) %>%
-  tidy()
 
 linear_reg()%>%
   set_engine("lm") %>%
-   fit(day_bike_count ~ mean_day_humidity + mean_day_temp_c + mean_day_rainfall, data = trialdf18) %>%
+   fit(day_bike_count ~ mean_day_humidity + mean_day_temp_c, data = trialdf18) %>%
   tidy()
 ```
 
@@ -554,14 +550,14 @@ linear_reg()%>%
 #INCLUDE (MODEL - all)
 bike_temp_humid_rain_fit <- linear_reg() %>% 
   set_engine("lm") %>%
-   fit(day_bike_count ~ mean_day_humidity + mean_day_temp_c + mean_day_rainfall, data = trialdf18)
+   fit(day_bike_count ~ mean_day_humidity + mean_day_temp_c, data = trialdf18)
 
  bike_temp_humid_rain_fit_aug <- augment(bike_temp_humid_rain_fit$fit)
 
 ggplot(bike_temp_humid_rain_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
   geom_point(alpha = 0.5) +
   geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
-  labs(x = "Predicted bike demand", y = "Residuals", title = "Residuals for Predicted Bike Demand from Mean Daily: Temperature, Humidity, and Rainfall") +
+  labs(x = "Predicted bike demand", y = "Residuals", title = "Residuals for Predicted Bike Demand from Mean Daily: Temperature and Humidity") +
   theme_bw()
 
 glance(bike_temp_humid_rain_fit)
