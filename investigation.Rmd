@@ -134,6 +134,9 @@ labs(title = "Correlation Between Temperature and Bike Demand",
 ```{r trial3}
 #added to report
 #Correlation between Temperature and Bike Demand
+
+#Lizzy in report
+
 trialdf6 <- df %>% 
   select(date, rented_bike_count, temperature_c, seasons) %>%
   group_by(date) %>%
@@ -306,7 +309,7 @@ cor(trialdf10$Mean, trialdf11$m)
 
 ```{r trial 8}
 
-#already included
+#Lizzy in report
 
 trialdf12 = df %>% select(-functioning_day, -holiday) %>% mutate(date = as.Date(date, format = "%d/%m/%Y"), seasons = factor(seasons, levels = c("Winter", "Spring", "Summer", "Autumn"))) %>% group_by(date, seasons) %>% 
   summarise(
@@ -318,7 +321,7 @@ trialdf13 = df %>% select(-functioning_day, -holiday) %>% mutate(date = as.Date(
     m = mean(temperature_c, na.rm = TRUE)
   )
 
-coeff = 0.005
+coeff = 0.025
 
 ggplot() +
   geom_point(data = trialdf12, aes(x = date, y = Mean), stat = "identity", colour = "plum") +
@@ -372,12 +375,14 @@ mapping = aes(x=day_bike_count,
 
 
 ```{r trial 10}
-#dont include
-trialdf15 <- df%>% select(date, rented_bike_count, solar_radiation_mj_m2)%>% group_by(date) %>%
+trialdf15 <- df%>% select(date, rented_bike_count, solar_radiation_mj_m2)%>% group_by(date)
+trialdf15 <- df%>% 
+  select(date, rented_bike_count, solar_radiation_mj_m2)%>% 
+  group_by(date) %>%
   mutate(
     hours_of_sunlight=sum(solar_radiation_mj_m2 > 0, na.rm = TRUE),
-      mean_bike_count= mean(rented_bike_count)) %>%
-  mutate(date = as.Date(date, format = "%d/%m/%Y"))
+      mean_bike_count= mean(rented_bike_count))
+
 
 ```
 
@@ -386,7 +391,7 @@ trialdf15 <- df%>% select(date, rented_bike_count, solar_radiation_mj_m2)%>% gro
 trialdf15%>% 
 ggplot( 
        mapping = aes(x = hours_of_sunlight, y = mean_bike_count)) +
-      geom_point(colour = "gold") +
+      geom_point(alpha = 0.5, colour = "gold") +
       labs( x = "Hours of Sunlight",
             y = "Mean Bike Count for a Day",
             title = "Effect of Hours of Sunlight on Mean Bike Count for a Day") +
@@ -480,7 +485,8 @@ ggplot(data = df_temp_mean, aes(x = temp_grp, y = mean_bike_count, fill = "salmo
   geom_col()+
   theme_bw()+
   labs(x = "Temperature group", 
-       y = "Number of Rented Bikes")+
+       y = "Number of Rented Bikes", 
+       title = "Rented bike count by temperature group")+
   theme(legend.position = "none")
 ```
 
@@ -564,6 +570,7 @@ Comments about model:
 from graph linear relationship appears strong
 from residual plot we can see as predicted bike demand increases the residuals increase as well which is a pattern meaning the model is not a good fit, additionally they are not randomly scattered around 0.
 residuals are quite significant, upto almost -20,000 meaning the accuracy is low
+<<<<<<< HEAD
 from the glance function, r squared is 0.606 which is 60.6% so mean temperature, mean humidity and mean rainfall explain 60.6% of variance in the daily bike demand which is decent for the model.
 formula for expected bike demand: daily bike demand = 15315.83 + 710.49 ✕ mean daily temp - 117.2 ✕ mean daily humidity - 4937.78 ✕ mean daily rainfall
 intercept is 15315.83 which is the expected demand for when mean daily temperature and mean daily humidity are 0, it is not exactly possible as bike demand cannot be in decimals but an approximate demand of 15316 is possible.
@@ -590,3 +597,126 @@ ggplot(bike_humid_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
 glance(bike_humid_fit)
 ```
 
+from the glance function, r squared is 0.488 which is 48.8% so mean temperature explains 48.8% of variance in the daily bike demand which is decent for the model.
+formula for expected bike demand: daily bike demand = 8906.84 + 621.26 ✕ mean daily temp
+intercept is 8906.84 which is the expected demand for when mean daily temperature is 0, it is not exactly possible as bike demand cannot be in decimals but an approximate demand of 8907 is possible.
+the slope is 621.26 which means on average as the mean daily temperature increases by one degree celsius, we expect the demand of bikes for that day to increase by 621.26. Again while it is not possible to have an increase in bikes in decimals, an approximate increase of 621 is possible. 
+Overall, this model is not a good fit as we cannot accurately estimate the expected bike demand for a day due to the pattern seen in the residuals. But, we can say temperature has a significant influence on bike demand as it explains almost 50% of the variation seen in bike demand.
+
+```{r trial 19 - model 4}
+bike_sun_df <- trialdf15 %>%
+  group_by(date, hours_of_sunlight) %>%
+  summarise(day_bike_count = sum(rented_bike_count))
+
+bike_sun_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(day_bike_count ~ hours_of_sunlight, data = bike_sun_df)
+  
+tidy(bike_sun_fit)
+
+
+ggplot(data = bike_sun_df, mapping = aes(x = hours_of_sunlight, y = day_bike_count)) +
+  geom_jitter(alpha = 0.5, colour = "gold") +
+geom_smooth(method = "lm", colour = "skyblue", se = FALSE) +
+  labs( x = "Hours of Sunlight",
+        y = "Total Bike Count for a Day",
+        title = "Linear model for daily bike count from hours of sunlight") +
+  theme_bw()
+```
+```{r trial 20 - model 3 assessment}
+ bike_sun_aug <- augment(bike_sun_fit$fit)
+
+ggplot(bike_sun_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted bike demand", y = "Residuals", title = "Residuals for Predicted Bike Demand from Sunlight hours") +
+  theme_bw()
+
+glance(bike_sun_fit)
+
+```
+
+formula : bikedemand = -25386.97 + 3461.56*sunlighthours
+The formula for this linear model tells us that, on average, for every hour increase in sunlight in a day, the total bike demand increases by 3461.56 for that day. The decimals are not possible, however we can round this up for the model to give a reasonable predicted on change in bike demand with sunlight hours.
+On the other hand, the model predicts a value of -25386.97 for bike demand when there are 0 hours of sunlight in a day, which is not possible and tells us the model may not be suitable.
+The adjusted R^2 value for this model tells us that around 47% of the variability in response is explained by the linear model.
+
+
+
+```{r }
+
+df_bike_cat <- df %>% 
+  mutate(bike_grp = factor(
+    case_when(
+      rented_bike_count <= 400 ~ "0-400",
+      rented_bike_count <= 800 ~ "401-800",
+      rented_bike_count <= 1200 ~ "801-1200",
+      rented_bike_count <= 1600 ~ "1201-1600",
+      rented_bike_count <= 2000 ~ "1601-2000",
+      rented_bike_count <= 2400 ~ "2001-2400",
+      rented_bike_count > 2400 ~ "Greater than 2400"
+    ),
+    levels = c("0-400",
+               "401-800",
+               "801-1200",
+               "1201-1600",
+               "1601-2000",
+               "2001-2400",
+               "Greater than 2400"),
+    ordered = TRUE
+  ))
+
+set.seed(1234)
+
+bike_split <- initial_split(df_bike_cat)
+bike_train <- training(bike_split)
+bike_test <- testing(bike_split)
+
+bike_rec <- recipe(bike_grp ~ temperature_c, 
+                   data = bike_train)
+
+bike_mod <- multinom_reg() %>% 
+  set_engine("nnet") 
+
+bike_wflow <- workflow() %>% 
+  add_model(bike_mod) %>% 
+  add_recipe(bike_rec)
+
+bike_fit <- bike_wflow %>% 
+  fit(data = bike_train)
+
+bike_pred <- predict(bike_fit, bike_test, type = "prob") %>% 
+  bind_cols(predict(bike_fit, bike_test, type = "class")) %>%
+  bind_cols(bike_test %>% select(bike_grp, temperature_c))
+
+
+bike_pred %>%
+  roc_auc(
+    truth = bike_grp,
+    `.pred_0-400`,
+    `.pred_401-800`,
+    `.pred_801-1200`,
+    `.pred_1201-1600`,
+    `.pred_1601-2000`,
+    `.pred_2001-2400`,
+    `.pred_Greater than 2400`,
+    estimator = "hand_till"
+  )
+
+bike_pred %>%
+  roc_curve(
+    truth = bike_grp,
+    `.pred_0-400`,
+    `.pred_401-800`,
+    `.pred_801-1200`,
+    `.pred_1201-1600`,
+    `.pred_1601-2000`,
+    `.pred_2001-2400`,
+    `.pred_Greater than 2400`,
+    estimator = "hand_till"
+  ) %>%
+  autoplot()
+
+
+
+```
