@@ -841,6 +841,10 @@ collect_metrics(dwb_fit_rs)
 collect_metrics(dwb_fit_rs, summarize = FALSE) %>%
   print(n=10)
 
+#for RMSE context
+range(dwb_test$day_bike_count)
+
+
 ```
 ```{r trial 22}
 
