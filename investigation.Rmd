@@ -518,7 +518,7 @@ glance(bike_temp_fit)
 
 
 ```{r trial 17 - model 2}
-#INCLUDE (model-all)
+#INCLUDE (model- temp&sun)
 #joining data frames
 bike_sun_df <- trialdf15 %>%
   group_by(date, hours_of_sunlight) %>%
@@ -551,7 +551,7 @@ dwb_wflow <- workflow() %>%
    add_recipe(dwb_rec)
 dwb_wflow
 
-#fitting
+#fitting to training set
 dwb_fit <- dwb_wflow %>% 
   fit(data = dwb_train)
 
@@ -560,6 +560,7 @@ dwb_fit
 
 
 ```{r trail 17.5}
+#MODEL WF - temp&sun&humid
 
 dwb_rec2 <- recipe(day_bike_count ~ mean_day_temp_c + hours_of_sunlight + mean_day_humidity, data = dwb_train)
 
@@ -613,7 +614,7 @@ adj_r2
 
 ```{r trial 18 - model 2 assessment}
 #INCLUDE (MODEL - all)
-#predictions for training data
+#predictions for training data (temp&sun)
 dwb_train_pred <- predict(dwb_fit, dwb_train)%>%
 bind_cols(dwb_train %>% select(date, day_bike_count))
 
@@ -625,7 +626,7 @@ rsq(dwb_train_pred, truth = day_bike_count, estimate = .pred)
 #calculating rmse for training data
 rmse(dwb_train_pred, truth = day_bike_count, estimate = .pred)
 
-#predictions for testing data
+#predictions for testing data (temp&sun)
 dwb_test_pred <- predict(dwb_fit, dwb_test)%>%
 bind_cols(dwb_test%>% select(date, day_bike_count))
 dwb_test_pred
@@ -696,7 +697,7 @@ bike_all_fit <- linear_reg() %>%
 ggplot(bike_all_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
   geom_point(alpha = 0.5) +
   geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
-  labs(x = "Predicted bike demand", y = "Residuals", title = "Residuals for Predicted Bike Demand from Mean Daily: Temperature, Humidity, and Hours of Sunlight") +
+  labs(x = "Predicted bike demand", y = "Residuals", title = "Residuals for Predicted Bike Demand", subtitle = "from Temperature, Humidity, and Hours of Sunlight") +
   theme_bw()
 
 ```
@@ -828,6 +829,7 @@ bike_pred %>%
 
 ```
 ```{r trial 21}
+#cross val using temp&sun model
 set.seed(345)
 folds <- vfold_cv(dwb_train, v = 5)
 folds
@@ -847,5 +849,20 @@ range(dwb_test$day_bike_count)
 
 ```
 ```{r trial 22}
+#cross val using temp sun humid model
+
+set.seed(345)
+folds <- vfold_cv(dwb_train, v = 5)
+folds
+
+dwb_fit_rs2 <- dwb_wflow2 %>%
+  fit_resamples(folds)
+dwb_fit_rs2
+
+collect_metrics(dwb_fit_rs2)
+  
+collect_metrics(dwb_fit_rs2, summarize = FALSE) %>%
+  print(n=10)
+
 
 ```
