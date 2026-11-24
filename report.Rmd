@@ -22,6 +22,7 @@ library(ggcube)
 library(geometry)
 library(gganimate)
 library(plotly)
+library(knitr)
 
 ```
 
@@ -115,8 +116,7 @@ tempdf <- left_join(humid_temp, df_bike_rain, by = c("date", "day_bike_count"))
 
 Describe your research question here. Include why this question might be of interest. 
 
-
-
+Our research question, ‘To what extent can variation in bike demand throughout the year in Seoul be attributed to changes in weather?’ aims to explore and model how different weather related factors affect fluctuations in bike demand in Seoul from the given data frame. This question might be of interest to local governing bodies when designing infrastructure or bike sharing companies that might want to optimise pricing and distribution of bikes.
 
 
 ## Data
@@ -127,8 +127,26 @@ See http://libraryguides.vu.edu.au/c.php?g=386501&p=4347840 for guidance on prop
 If you got your data off the web, make sure to state the retrieval date.
 
 
+Our investigation uses the Seoul Bike Sharing Demand dataset by UC Irvine Machine Learning Repository with 14 variables and 8760 observations, consisting of readings over every hour of every day between the dates 01/12/2017 and 30/11/2018. 
 
+We used the following variables in the initial dataset in our exploration:
 
+```{r variables table, echo = FALSE}
+key_vars <- tibble(Variable = c("date", "rented_bike_count", "hour", "temperature_c", "humidity", "rainfall_mm", "seasons", "solar_radiation"), Type = c("date", "integer", "integer", "continuous", "integer", "integer", "categorical", "continuous"), Description = c("date when recordings with taken", "hourly number of rented bikes", "hour of the day", "recorded temperature in degrees celsius", "recorded humidity as a percentage", "recorded rainfall in millimetres", "winter, spring, summer or autumn", "recorded solar radiation in megajoules per metre squared"))
+
+kable(key_vars)
+
+```
+
+We derived the following variables to be use in our analysis:
+```{r table1, echo = FALSE}
+der_vars <- tibble(Variable = c("mean_hourly_bike", "temp_group", "day_bike_count", "mean_day_humidity", "mean_day_temp_c", "mean_day_rainfall", "hours_sunlight"), 
+       Type = c( "numeric (double)", "factor with 7 levels", "numeric (integer)", "numeric (double)", " numeric (double)", "numeric (double)", "numeric (integer)"), 
+       Description = c("mean number of hourly rented bikes in a day", "temperature categorised into groups from 'Extremely Low' to 'Extremely High'", "total number of rented bikes in a day", "mean humidity in a day from hourly recordings", "mean temperature in a day from hourly recordings", "mean rainfall in a day from hourly recordings", "number of hours in a day where solar radiation > 0 ") )
+
+kable(der_vars)
+
+```
 
 
 ## Findings
@@ -150,6 +168,18 @@ You can also load your data here and present any analysis results / plots.
 Make sure to hide your code with  `echo = FALSE` unless the point you are trying to make is about the code itself, in which case you should show your code.
 
 
+#Assumptions and Limitations:
+When importing the dataset from excel into the R Studio project, the Date variable data type was converted into string rather than retaining its original format, so we performed data cleaning and transformation (in the form of as.Date()) to ensure all variables were suitable for analysis and effective plotting of data.
+
+Since we decided to measure the influence of predictors on a bike demand (a numerical variable), we were limited to using linear regression when it came to modelling as logistic regression is only suitable for predicting categorical variables. 
+
+During the exploration of the data it seemed there might be some anomalous values in our outcome variable, such as several days with a 0 rented bike count at all hours or some extremely high counts at some hours. However, after reviewing a boxplot below of all hourly rented bike counts, we decided to keep these values in our analysis as it would not make sense to remove the high bike counts.
+
+```{r boxplot, echo = FALSE}
+ggplot(data = df, mapping = aes(x = rented_bike_count))+
+  geom_boxplot()
+
+```
 
 
 
