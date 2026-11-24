@@ -558,6 +558,59 @@ dwb_fit <- dwb_wflow %>%
 dwb_fit
 ```
 
+
+```{r trail 17.5}
+
+dwb_rec2 <- recipe(day_bike_count ~ mean_day_temp_c + hours_of_sunlight + mean_day_humidity, data = dwb_train)
+
+#workflow
+dwb_wflow2 <- workflow() %>% 
+  add_model(dwb_model) %>%
+   add_recipe(dwb_rec2)
+dwb_wflow2
+
+#fitting
+dwb_fit2 <- dwb_wflow2 %>% 
+  fit(data = dwb_train)
+
+
+dwb_train_pred2 <- predict(dwb_fit2, dwb_train)%>%
+bind_cols(dwb_train %>% select(date, day_bike_count))
+
+
+#calculating r squared for training data 
+rsq(dwb_train_pred2, truth = day_bike_count, estimate = .pred)
+
+dwb_test_pred2 <- predict(dwb_fit2, dwb_test)%>%
+bind_cols(dwb_test%>% select(date, day_bike_count))
+
+
+#calculating r squared for testing data 
+rsq(dwb_test_pred2, truth = day_bike_count, estimate = .pred)
+
+
+r2 <- rsq(dwb_train_pred2, truth = day_bike_count, estimate = .pred)$.estimate
+
+n <- nrow(dwb_train_pred2)
+p <- 2
+
+adj_r2 <- 1 - (1 - r2) * (n - 1) / (n - p - 1)
+
+adj_r2
+
+r2 <- rsq(dwb_test_pred2, truth = day_bike_count, estimate = .pred)$.estimate
+
+n <- nrow(dwb_test_pred2)
+p <- 2
+
+adj_r2 <- 1 - (1 - r2) * (n - 1) / (n - p - 1)
+
+adj_r2
+
+
+
+```
+
 ```{r trial 18 - model 2 assessment}
 #INCLUDE (MODEL - all)
 #predictions for training data
@@ -582,7 +635,31 @@ rsq(dwb_test_pred, truth = day_bike_count, estimate = .pred)
 
 #calculating rmse for testing data
 rmse(dwb_test_pred, truth = day_bike_count, estimate = .pred)
+
+r2 <- rsq(dwb_train_pred, truth = day_bike_count, estimate = .pred)$.estimate
+
+n <- nrow(dwb_train_pred)
+p <- 2
+
+adj_r2 <- 1 - (1 - r2) * (n - 1) / (n - p - 1)
+
+adj_r2
+
+r2 <- rsq(dwb_test_pred, truth = day_bike_count, estimate = .pred)$.estimate
+
+n <- nrow(dwb_test_pred)
+p <- 2
+
+adj_r2 <- 1 - (1 - r2) * (n - 1) / (n - p - 1)
+
+adj_r2
+
+
 ```
+
+
+
+
 ```{r trial 18.5}
 # all predictors to make residual product
 #INCLUDE (model-all)
