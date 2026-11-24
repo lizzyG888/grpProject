@@ -1,6 +1,6 @@
 ---
 title: "Project title"
-author: "by Team-Name: User1, User2, User3, User4 & User5"
+author: "by Group 34: User1, User2, User3, User4 & User5"
 date: "`r Sys.Date()`"
 output: html_document
 ---
@@ -36,21 +36,21 @@ df = read.csv("data/SeoulBikeData.csv", fileEncoding = "latin1") %>% clean_names
 df_temp_mean <- df %>% 
   mutate(temp_grp = factor(
     case_when(
-      temperature_c <= -10 ~ "Extremely low",
-      temperature_c >= -10 & temperature_c < 0 ~ "Very low",
-      temperature_c >= 0 & temperature_c < 10 ~ "Low",
-      temperature_c >= 10 & temperature_c < 20 ~ "Mid",
-      temperature_c >= 20 & temperature_c < 30 ~ "High",
-      temperature_c >= 30 & temperature_c < 40 ~ "Very high",
-      TRUE ~ "Extremely high" 
+      temperature_c <= -10 ~ "< -10",
+      temperature_c >= -10 & temperature_c < 0 ~ "-10 - 0",
+      temperature_c >= 0 & temperature_c < 10 ~ "0 - 10",
+      temperature_c >= 10 & temperature_c < 20 ~ "10 - 20",
+      temperature_c >= 20 & temperature_c < 30 ~ "20 - 30",
+      temperature_c >= 30 & temperature_c < 40 ~ "30 - 40",
+      TRUE ~ "> 40" 
       ), 
-    level = c("Extremely low", 
-              "Very low", 
-              "Low", 
-              "Mid", 
-              "High", 
-              "Very high", 
-              "Extremely high"))) %>% 
+    level = c("< -10",
+              "-10 - 0",
+              "0 - 10", 
+              "10 - 20", 
+              "20 - 30", 
+              "30 - 40", 
+              "> 40"))) %>% 
   group_by(temp_grp) %>% 
   summarise(mean_bike_count = mean(rented_bike_count, na.rm= TRUE))
 
@@ -78,13 +78,13 @@ df_bike_rain <- df %>%
             mean_day_rainfall = mean(rainfall_mm))
 
 #trialdf12 -> df_bike_season
-df_bike_season = df %>% select(-functioning_day, -holiday) %>% mutate(date = as.Date(date, format = "%d/%m/%Y"), seasons = factor(seasons, levels = c("Winter", "Spring", "Summer", "Autumn"))) %>% group_by(date, seasons) %>% 
+df_bike_season = df %>% select(-functioning_day, -holiday) %>% mutate(seasons = factor(seasons, levels = c("Winter", "Spring", "Summer", "Autumn"))) %>% group_by(date, seasons) %>% 
   summarise(
     Mean = mean(rented_bike_count, na.rm = TRUE)
   )
 
 #trialdf13 -> df_temp_season
-df_temp_season = df %>% select(-functioning_day, -holiday) %>% mutate(date = as.Date(date, format = "%d/%m/%Y"), seasons = factor(seasons, levels = c("Winter", "Spring", "Summer", "Autumn"))) %>% group_by(date, seasons) %>% 
+df_temp_season = df %>% select(-functioning_day, -holiday) %>% mutate(seasons = factor(seasons, levels = c("Winter", "Spring", "Summer", "Autumn"))) %>% group_by(date, seasons) %>% 
   summarise(
     m = mean(temperature_c, na.rm = TRUE)
   )
@@ -142,7 +142,7 @@ We derived the following variables to be use in our analysis:
 ```{r table1, echo = FALSE}
 der_vars <- tibble(Variable = c("mean_hourly_bike", "temp_group", "day_bike_count", "mean_day_humidity", "mean_day_temp_c", "mean_day_rainfall", "hours_sunlight"), 
        Type = c( "numeric (double)", "factor with 7 levels", "numeric (integer)", "numeric (double)", " numeric (double)", "numeric (double)", "numeric (integer)"), 
-       Description = c("mean number of hourly rented bikes in a day", "temperature categorised into groups from 'Extremely Low' to 'Extremely High'", "total number of rented bikes in a day", "mean humidity in a day from hourly recordings", "mean temperature in a day from hourly recordings", "mean rainfall in a day from hourly recordings", "number of hours in a day where solar radiation > 0 ") )
+       Description = c("mean number of hourly rented bikes in a day", "temperature categorised into groups of range 10 degrees celcius", "total number of rented bikes in a day", "mean humidity in a day from hourly recordings", "mean temperature in a day from hourly recordings", "mean rainfall in a day from hourly recordings", "number of hours in a day where solar radiation > 0 ") )
 
 kable(der_vars)
 
@@ -168,7 +168,7 @@ You can also load your data here and present any analysis results / plots.
 Make sure to hide your code with  `echo = FALSE` unless the point you are trying to make is about the code itself, in which case you should show your code.
 
 
-#Assumptions and Limitations:
+### Assumptions and Limitations:
 When importing the dataset from excel into the R Studio project, the Date variable data type was converted into string rather than retaining its original format, so we performed data cleaning and transformation (in the form of as.Date()) to ensure all variables were suitable for analysis and effective plotting of data.
 
 Since we decided to measure the influence of predictors on a bike demand (a numerical variable), we were limited to using linear regression when it came to modelling as logistic regression is only suitable for predicting categorical variables. 
@@ -180,6 +180,78 @@ ggplot(data = df, mapping = aes(x = rented_bike_count))+
   geom_boxplot()
 
 ```
+
+### Exploration & Visualisations:
+
+```{r temp v bikes, echo = FALSE}
+coeff <- 0.001
+
+ggplot(data = df_bike_temp, mapping = aes(x = date)) +
+  geom_point(aes(y = day_bike_count), 
+             colour = "tomato", size = 1, alpha = 0.4) + 
+  geom_smooth(aes(y = day_bike_count), se = FALSE, 
+              colour = "tomato", linewidth = 0.6) +
+  geom_point(aes(y = mean_day_temp_c/ coeff), 
+             colour = "cornflowerblue", size = 1, alpha = 0.4) +
+  geom_smooth(aes(y = mean_day_temp_c/ coeff), se = FALSE, 
+              colour = "cornflowerblue", linewidth = 0.6) +
+  labs(x = "Date",
+       title = "Correlation Between Number of Rented Bikes and Temperature") +
+  scale_y_continuous(
+    name = "Number of Rented Bikes",
+    sec.axis = sec_axis(~.*coeff, name="Temperature (in degrees celsius)")
+  )+
+  theme(
+    axis.title.y = element_text(color = "tomato", size = 13),
+    axis.title.y.right = element_text(color = "cornflowerblue", size = 13)
+  ) 
+
+#by season
+
+
+coeff = 0.025
+
+ggplot() +
+  geom_point(data = df_bike_season, aes(x = date, y = Mean), stat = "identity", colour = "orchid", size = 2, alpha = 0.4) +
+  geom_smooth(data = df_bike_season, aes(x = date, y = Mean), se = FALSE, colour = "orchid") +
+  geom_point(data = df_temp_season, aes(x = date, y = m/coeff),colour = "palevioletred", size = 2, alpha = 0.4) +
+  geom_smooth(data = df_temp_season, aes(x = date, y = m/coeff), se = FALSE,colour = "palevioletred") +
+  scale_y_continuous(
+    name = "Mean Rented Bike Count",
+    sec.axis = sec_axis(~.*coeff, name="Mean Temperature (C)")
+  )+
+  theme(
+    axis.title.y = element_text(colour = "orchid", size=13),
+    axis.title.y.right = element_text(colour = "palevioletred", size=13)
+  ) +
+  
+  labs(
+    x = "Date",
+    title = "Effect Temperature has on Rented Bike Count per Day"
+  ) + 
+  facet_wrap(~ seasons, scales = "free_x") 
+
+```
+
+Both graphs illustrate the relationship between number of rented bikes and temperature throughout the year, except that Figure 1 examines the overall trend across the whole year whereas Figure 2 separates the data into four seasons, allowing seasonal variations to be explored and viewed in greater detail. Both graphs show that generally as temperature increases, so does bike demand implying that there is a relationship between warmer weather and greater demand for rental bikes. 
+
+Although the graphs suggest an association, this does not prove that temperature directly influences bike rental demand as correlation does not imply causation. Additionally, both graphs follow a similar trend, peaking in the summer (in the middle of the year) with either end of the year dipping to lower bike rental counts and lower temperatures. Both graphs also show a peak of both bike rentals and temperature during the summer period, but this is particularly visible in the initial graph; yet from this graph there is a distinct difference in the peaks between bike rentals and temperature, suggesting that temperature does not fully explain the variation in bike rental demand. The second graph breaks down the data in 4 segments to get a more precise reading and trend per season, showing a clear and distinct positive relationship in spring and more.
+The Pearson correlation coefficient for Figure 1 was calculated to be 0.69982 to 5 significant figures, suggesting a moderately strong linear relationship between the two variables, supporting the relationship deduced from the first graph; however the value is not strong enough for temperature to be the only variable affecting bike rental demand. 
+
+This can be further attested to by the graph below which measures the mean bike count for each temperature group:
+
+```{r temp bar, echo = FALSE}
+
+ggplot(data = df_temp_mean, aes(x = temp_grp, y = mean_bike_count, fill = "salmon" ))+
+  geom_col()+
+  theme_bw()+
+  labs(x = "Temperature group (degrees celsius)",
+       y = "Number of Rented Bikes", 
+       title = "Rented bike count by temperature group")+
+  theme(legend.position = "none")
+```
+
+
 
 
 
