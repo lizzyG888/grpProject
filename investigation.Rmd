@@ -592,7 +592,7 @@ rsq(dwb_test_pred2, truth = day_bike_count, estimate = .pred)
 r2 <- rsq(dwb_train_pred2, truth = day_bike_count, estimate = .pred)$.estimate
 
 n <- nrow(dwb_train_pred2)
-p <- 2
+p <- 3
 
 adj_r2 <- 1 - (1 - r2) * (n - 1) / (n - p - 1)
 
@@ -601,7 +601,7 @@ adj_r2
 r2 <- rsq(dwb_test_pred2, truth = day_bike_count, estimate = .pred)$.estimate
 
 n <- nrow(dwb_test_pred2)
-p <- 2
+p <- 3
 
 adj_r2 <- 1 - (1 - r2) * (n - 1) / (n - p - 1)
 
