@@ -114,8 +114,6 @@ tempdf <- left_join(humid_temp, df_bike_rain, by = c("date", "day_bike_count"))
 
 ## Research Question
 
-Describe your research question here. Include why this question might be of interest. 
-
 Our research question, ‘To what extent can variation in bike demand throughout the year in Seoul be attributed to changes in weather?’ aims to explore and model how different weather related factors affect fluctuations in bike demand in Seoul from the given data frame. This question might be of interest to local governing bodies when designing infrastructure or bike sharing companies that might want to optimise pricing and distribution of bikes.
 
 
@@ -182,6 +180,7 @@ ggplot(data = df, mapping = aes(x = rented_bike_count))+
 ```
 
 ### Exploration & Visualisations:
+#### 1. Temperature and Bike Demand
 
 ```{r temp v bikes, echo = FALSE}
 coeff <- 0.001
@@ -250,13 +249,86 @@ ggplot(data = df_temp_mean, aes(x = temp_grp, y = mean_bike_count, fill = "salmo
        title = "Rented bike count by temperature group")+
   theme(legend.position = "none")
 ```
+#### 2. Humidity and Bike Demand
 
+```{r humidity v bikes, echo = FALSE}
+#Correlation between Humidity and Bike Demand
 
+coeff <- 0.001
 
+ggplot(df_bike_humid, aes(x = date)) +
+  geom_point(aes(y = day_bike_count), colour = "hotpink", size = 0.6) + 
+  geom_smooth(aes(y = day_bike_count), se = FALSE, colour = "hotpink", size = 0.6) +
+  geom_point(aes(y = mean_day_humidity/ coeff), colour = "chartreuse4", size = 0.6) +
+  geom_smooth(aes(y = mean_day_humidity/ coeff), se = FALSE, colour = "chartreuse4", size = 0.6) +
+  labs(x = "Date",
+       title = "Correlation Between Number of Rented Bikes and Mean Humidity") +
+  scale_y_continuous(
+    name = "Number of Rented Bikes",
+    sec.axis = sec_axis(~.*coeff, name="Humidity (%)")
+  )+
+  theme(
+    axis.title.y = element_text(color = "hotpink", size=13),
+    axis.title.y.right = element_text(color = "chartreuse4", size=13)
+  ) 
+
+df_bike_humid %>% summarise(Correlation = cor(day_bike_count, mean_day_humidity))
+```
+Here, we observed the relationship between the number of bikes rented daily and the mean humidity of that day. In the above figure, both graphs peak and fall at around the same time, following similar trends implying that as mean humidity increases the number of bikes demanded in a day increases as well. However, while the data points for the number of rented bikes remain, for the most part, close to their associated graph, we can see that the data points for humidity rarely follow the plotted line. This tells us that humidity does not follow a recognisable trend over the year leading its graph to be underfitted. Additionally, the pearson correlation coefficient of 0.028 tells us that there is a positive but very weak correlation between humidity and number of bikes demanded in a day.
+
+#### 3. Rainfall and Bike Demand
+
+```{r bike v rainfall, echo = FALSE}
+coeff <- 0.0001
+
+ggplot(df_bike_rain, aes(x = date)) +
+  geom_point(aes(y = day_bike_count), colour = "violetred", size = 0.6) + 
+  geom_smooth(aes(y = day_bike_count), se = FALSE, colour = "violetred", size = 0.6) +
+  geom_point(aes(y = mean_day_rainfall/ coeff), colour = "royalblue4", size = 0.6) +
+  geom_smooth(aes(y = mean_day_rainfall/ coeff), se = FALSE, colour = "royalblue4", size = 0.6) +
+  labs(x = "Date",
+       title = "Correlation Between Number of Rented Bikes and Mean Rainfall for a Day") +
+  scale_y_continuous(
+    name = "Number of Rented Bikes",
+    sec.axis = sec_axis(~.*coeff, name="Rainfall (mm)")
+  )+
+  theme(
+    axis.title.y = element_text(color = "violetred", size=13),
+    axis.title.y.right = element_text(color = "royalblue4", size=13)
+  ) 
+
+df_bike_rain %>% summarise(Correlation = cor(day_bike_count, mean_day_rainfall))
+
+```
+
+Above, we plotted the graphs for the number of rented bikes in a day and the mean rainfall for that day measured in millimetres. From the graphs it appears that there is no visible relationship between the demand for bikes and rainfall, as the demand rises and falls as rainfall remains almost constant at low levels with few exceptions. This is seen in a low Pearson correlation coefficient of -0.214 which tells us there is a negative and weak relationship between rainfall and bikes demanded. The boxplot below shows that most, if not, all of the non-zero values in the rainfall variable are anomalous, making it almost impossible to make a reliable model to predict bike count from rainfall. Hence, we decided not to include rainfall as a predictor in our models.
+
+```{r rain boxplot, echo = FALSE}
+```
+
+### Modelling:
+#### 1. Multiple Predictors: Temperature, Humidity and Hours of Sunlight
+
+```{r multiple predictors, echo = FALSE}
+```
+
+#### 2. Temperature as a Singular Predictor
+
+```{r temperature predictor, echo = FALSE}
+```
+
+#### 3. Humidity as a Singular Predictor
+
+```{r humidity predictor, echo = FALSE}
+```
+
+#### 4. Sunlight as a Singular Predictor
+
+```{r sunlight predictor, echo = FALSE}
+```
 
 
 ## References
-
-List any references here. You should, at a minimum, list your data source.
-
+Seoul Bike Sharing Demand. 2020. UC Irvine Machine Learning Repository.
+https://archive.ics.uci.edu/dataset/560/seoul+bike+sharing+demand
 
