@@ -309,7 +309,7 @@ Above, we plotted the graphs for the number of rented bikes in a day and the mea
 ### Modelling:
 #### 1. Multiple Predictors: Temperature, Humidity and Hours of Sunlight
 
-```{r multiple predictors, echo = FALSE}
+```{r 3 predictors, echo = FALSE}
 ```
 
 #### 2. Temperature as a Singular Predictor
@@ -325,6 +325,11 @@ Above, we plotted the graphs for the number of rented bikes in a day and the mea
 #### 4. Sunlight as a Singular Predictor
 
 ```{r sunlight predictor, echo = FALSE}
+```
+
+#### 5. Multiple Predictors: Temperature and Hours of Sunlight
+
+```{r 2 predictors, echo = FALSE}
 ```
 
 
