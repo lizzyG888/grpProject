@@ -607,6 +607,8 @@ adj_r2 <- 1 - (1 - r2) * (n - 1) / (n - p - 1)
 
 adj_r2
 
+rmse(dwb_test_pred2, truth = day_bike_count, estimate = .pred)
+
 
 
 ```
