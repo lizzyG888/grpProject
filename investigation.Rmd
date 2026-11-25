@@ -375,7 +375,6 @@ mapping = aes(x=day_bike_count,
 
 
 ```{r trial 10}
-trialdf15 <- df%>% select(date, rented_bike_count, solar_radiation_mj_m2)%>% group_by(date)
 trialdf15 <- df%>% 
   select(date, rented_bike_count, solar_radiation_mj_m2)%>% 
   group_by(date) %>%
