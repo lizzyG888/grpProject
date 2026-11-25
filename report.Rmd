@@ -148,23 +148,9 @@ kable(der_vars)
 
 
 ## Findings
-
-The write-up of your project and findings go here. 
-
-Think of this as the text of your presentation with some extra detail to cover what there was not time to discuss in the presentation. This might include any assumptions you made when doing your analysis, any limitations of the work you have done or any ideas you have for future work. Feel free to split this section into subsections to make it easier to read. 
-
-The length should be roughly 1,500 words. 
 If you want to use a word count addin, you can install this by copying and pasting the following into RStudio:
 
 `devtools::install_github("benmarwick/wordcountaddin", type = "source", dependencies = TRUE)`
-
-You will then need to restart RStudio. Once you have done that, select the text you want to count the words of, go to Addins, and select the `Word count` addin.
-This addin counts words using two different algorithms, but the results should be similar and as long as you're in the ballpark of 1,500 words, you're good! 
-The addin will ignore code chunks and only count the words in prose. If you don't want to use the addin you can always copy and paste the text into Microsoft Word to do a Word Count!
-
-You can also load your data here and present any analysis results / plots.
-Make sure to hide your code with  `echo = FALSE` unless the point you are trying to make is about the code itself, in which case you should show your code.
-
 
 ### Assumptions and Limitations:
 When importing the dataset from excel into the R Studio project, the Date variable data type was converted into string rather than retaining its original format, so we performed data cleaning and transformation (in the form of as.Date()) to ensure all variables were suitable for analysis and effective plotting of data.
@@ -249,6 +235,7 @@ ggplot(data = df_temp_mean, aes(x = temp_grp, y = mean_bike_count, fill = "salmo
        title = "Rented bike count by temperature group")+
   theme(legend.position = "none")
 ```
+
 #### 2. Humidity and Bike Demand
 
 ```{r humidity v bikes, echo = FALSE}
@@ -310,23 +297,102 @@ Above, we plotted the graphs for the number of rented bikes in a day and the mea
 #### 1. Multiple Predictors: Temperature, Humidity and Hours of Sunlight
 
 ```{r 3 predictors, echo = FALSE}
+bike_all_fit <- linear_reg() %>% 
+  set_engine("lm") %>%
+  fit(day_bike_count ~ mean_day_humidity + mean_day_temp_c + hours_of_sunlight, data = daily_weather_bike)
+
+ bike_all_fit_aug <- augment(bike_all_fit$fit)
+
+ggplot(bike_all_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted bike demand", y = "Residuals", title = "Residuals for Predicted Bike Demand", subtitle = "from Temperature, Humidity, and Hours of Sunlight") +
+  theme_bw()
 ```
+
+We modelled the demand for bikes using linear regression where temperature, humidity and hours of sunlight are predictors and we obtained the following equation:
+$$
+D_E = 5188.0 + 540.0T_M - 177.7H_M + 1236.7S_H
+$$
+Where:  
+$D_E =$ Estimated Daily Demand  
+$T_M =$ Mean Daily Temperature  
+$H_M =$ Mean Daily Humidity  
+$S_H =$ Daily Hours of Sunlight  
+From the equation we can see that the intercept is 5188 which is the expected demand for bikes when mean daily temperature, mean daily humidity and hours of sunlight are all equal to 0. The slope of mean daily temperature is 540, which means that on average as the mean daily temperature increases by one degree celsius, we expect the demand of bikes for that day to increase by 540. The slope of mean daily humidity is -177.7 which means on average as the mean daily humidity increases by one percent, we expect the demand of bikes for that day to decrease by approximately 178. Again, the slope of hours of sunlight is 1236.7 which means on average as the hours of sunlight in a day increases by one hour, we expect the demand of bikes for that day to increase by approximately 1237. From the residual plot we can see a pattern as predicted bike demand increases the residuals increase, implying that the model is not a good fit, additionally they are not randomly scattered around 0; so overall, this model might not be an ideal fit as we cannot accurately estimate the expected daily bike demand as there is a fan shape present in the residual plot which indicates that the assumption of constant variance is violated. 
+
+Further down we explore more models as we try to find one with a suitable fit, so the adjusted R squared value must be used over the R squared value as it considers the number of predictors for complexity’s sake. As a result, the adjusted R squared value for the testing data for this model is 0.638, showing that the selected variables explain roughly 63.8% of the variation in daily demand. Additionally, the RMSE value for the testing data is 6285.3 which represents root mean square error, which can be used through comparison to identify the model with the higher prediction accuracy.
 
 #### 2. Humidity as a Singular Predictor
 
 ```{r humidity predictor, echo = FALSE}
+bike_humid_fit <- linear_reg() %>% 
+  set_engine("lm") %>%
+   fit(day_bike_count ~ mean_day_humidity, data = humid_temp)
+
+ bike_humid_fit_aug <- augment(bike_humid_fit$fit)
+
+ggplot(bike_humid_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted bike demand", y = "Residuals", title = "Residuals for Predicted Bike Demand from Mean Daily Humidity") +
+  theme_bw()
+
 ```
 
 #### 3. Sunlight as a Singular Predictor
 
 ```{r sunlight predictor, echo = FALSE}
+#Creating linear model
+bike_sun_fit <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(day_bike_count ~ hours_of_sunlight, data = bike_sun_df)
+
+ggplot(data = bike_sun_df, mapping = aes(x = hours_of_sunlight, y = day_bike_count)) +
+  geom_jitter(alpha = 0.5, colour = "gold") +
+geom_smooth(method = "lm", colour = "skyblue", se = FALSE) +
+  labs( x = "Hours of Sunlight",
+        y = "Total Bike Count for a Day",
+        title = "Linear model for daily bike count from hours of sunlight") +
+  theme_bw()
+
+#Plotting Residuals
+bike_sun_aug <- augment(bike_sun_fit$fit)
+
+ggplot(bike_sun_aug, mapping = aes(x = .fitted, y = .resid)) +
+  geom_jitter(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(x = "Predicted bike demand", y = "Residuals", title = "Residuals for Predicted Bike Demand from Sunlight hours") +
+  theme_bw()
+
 ```
 
 #### 4. Multiple Predictors: Temperature and Hours of Sunlight
 
+From the model 3 we deduced that humidity has little effect on the variation in daily demand, suggesting that it is a poor model. Since this is the case, we produced another model without taking into account humidity and modelled the demand for bikes using linear regression where temperature and hours of sunlight are predictors and obtained the following equation:
+$$
+D_E = -9860.6 + 368.9T_M + 1799.8S_H
+$$
+Where:  
+$D_E =$ Estimated Daily Demand  
+$T_M =$ Mean Daily Temperature  
+$S_H =$ Daily Hours of Sunlight   
+
+This model takes into consideration only 2 variables, temperature and hours of sunlight, yet has a larger R squared value (from the test data) of 0.626, showing that it performs better on unseen data. Conversely, it performs slightly worse on the training data, as it has an R squared value of 0.492; however, as this is simpler than the initial model as only 2 variables are used as predictors, so the adjusted R squared value must be accounted for: for the test data, the adjusted R squared value is 0.618, showing that the chosen variables explain roughly 61.8% of the variation in daily demand. In addition, the RMSE value for the testing data in this model is 6486.3 which can be used for comparison.
+
 ```{r 2 predictors, echo = FALSE}
+
 ```
 
+### Model Evaluation
+#### Comparing Based on Adjusted R Squared and RMSE
+We can compare models 1 and 4 to find the ideal model to fit our data. Model 1 uses the 3 variables: Temperature, Humidity and Hours of Sunlight, whereas model 4 only uses 3 variables, Temperature and Hours of Sunlight. In model 1, we calculated the adjusted R squared value to be 0.638 for the testing data and the RMSE value to be 6285.3; however in model 4, the adjusted R squared value is calculated to be 0.618 for the testing data and the RMSE value to be 6486.3. The adjusted R squared value is preferred over just the R squared value as it takes into consideration the number of predictors which accounts for complexity. As we compare the adjusted R squared value for both models’ testing data, we can determine that the model 1 may be a more suitable fit as its adjusted R squared value is larger, meaning that it can explain more of the variation in bike demand. Moreover, model 1 has a smaller RMSE value, demonstrating that it has less error and a higher prediction accuracy. Overall, this suggests that model 1 is a much better fit for the data, despite the exploration done in model 2.
+
+#### Comparing Based on Cross Validation
+
+## Ethics and Reproducibility
+From the given data, we saw no immediate ethics concerns as none of the data is personal and only general readings such as demand count, temperature and more are utilised. 
+Moreover, as we set a seed and make use of workflows, our models are easily reproducible as random processes such as splits produce consistent results every time our code is run.
 
 ## References
 Seoul Bike Sharing Demand. 2020. UC Irvine Machine Learning Repository.
