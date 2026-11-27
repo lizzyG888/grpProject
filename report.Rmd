@@ -410,6 +410,6 @@ From the given data, we saw no immediate ethics concerns as none of the data is 
 Moreover, as we set a seed and make use of workflows, our models are easily reproducible as random processes such as splits produce consistent results every time our code is run.
 
 ## References
-Seoul Bike Sharing Demand. 2020. UC Irvine Machine Learning Repository.
+UC Irvine Machine Learning Repository. Seoul Bike Sharing Demand. Retrieved October 18, 2026, from 
 https://archive.ics.uci.edu/dataset/560/seoul+bike+sharing+demand
 
