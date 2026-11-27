@@ -340,6 +340,9 @@ ggplot(bike_humid_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
 
 ```
 
+We also modelled the demand using only the humidity variable as a predictor. This gave the following equation:
+
+
 #### 3. Sunlight as a Singular Predictor
 
 ```{r sunlight predictor, echo = FALSE}
@@ -366,6 +369,18 @@ ggplot(bike_sun_aug, mapping = aes(x = .fitted, y = .resid)) +
   theme_bw()
 
 ```
+
+We also modelled the demand using only hours of sunlight as a predictor. This gave the following equation:
+$$
+D_E = -25387.0 + 3461.6S_H
+$$
+
+$D_E =$ Estimated Daily Demand  
+$S_H =$ Daily Hours of Sunlight
+
+As the variable hours of sunlight is of the discrete integer data type, we can treat this as categorical and hence we use geom.jitter in the residual model to easily interpret the data.
+From the linear model we can see that the values are concentrated between 8 to 16 hours which also causes the residuals to be concentrated around the corresponding values of the bike demand. However, in that range, the residuals are scattered around zero with no visible pattern which indicates that this model is a good fit for the data.
+
 
 #### 4. Multiple Predictors: Temperature and Hours of Sunlight
 

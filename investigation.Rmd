@@ -743,7 +743,7 @@ geom_smooth(method = "lm", colour = "skyblue", se = FALSE) +
  bike_sun_aug <- augment(bike_sun_fit$fit)
 
 ggplot(bike_sun_aug, mapping = aes(x = .fitted, y = .resid)) +
-  geom_point(alpha = 0.5) +
+  geom_jitter(alpha = 0.5) +
   geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
   labs(x = "Predicted bike demand", y = "Residuals", title = "Residuals for Predicted Bike Demand from Sunlight hours") +
   theme_bw()
