@@ -2,6 +2,12 @@
 
 This is a template repository for your group project. One of your group members should clone this repository and add the other team members as collaborators. You should also add the `uoeIDS` course GitHub account as a collaborator.
 
+## Team members
+
+- Ella Hoang-Elcome ( ), ellahoanglcm
+- Lizzy Goh (s2952979), lizzyG888
+- Parinoor Sekhon ( ), ps-18-6
+
 ## Repository structure
 
 - `/data` -- Save any data you are using for your project in this folder.
@@ -32,12 +38,10 @@ There will be two check-in points where you will have a discussion with a tutor 
 
 ## Check-in 1 (week 6)
 
-- item 1
-- item 2
-- etc.
+- Comment of ethics aspects 
+- think of what models to include: logistic vs linear, etc...
+- 
 
 ## Check-in 2 (week 10)
 
-- item 1
-- item 2
-- etc.
+- 
