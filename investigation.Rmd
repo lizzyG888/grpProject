@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-=======
+
 ---
 title: "IDS investigation worksheet"
 author: "TBD: Ella, Lizzy & Pari"
@@ -793,4 +792,3 @@ collect_metrics(dwb_fit_rs2, summarize = FALSE) %>%
 
 
 ```
->>>>>>> 3e378ad22ca0fda8a870d96ff31b55e0105ec9bb
