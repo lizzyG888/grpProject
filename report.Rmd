@@ -220,7 +220,7 @@ ggplot() +
 
 Both graphs illustrate the relationship between number of rented bikes and temperature throughout the year, except that Figure 1 examines the overall trend across the whole year whereas Figure 2 separates the data into four seasons, allowing seasonal variations to be explored and viewed in greater detail. Both graphs show that generally as temperature increases, so does bike demand implying that there is a relationship between warmer weather and greater demand for rental bikes. 
 
-Although the graphs suggest an association, this does not prove that temperature directly influences bike rental demand as correlation does not imply causation. Additionally, both graphs follow a similar trend, peaking in the summer (in the middle of the year) with either end of the year dipping to lower bike rental counts and lower temperatures. Both graphs also show a peak of both bike rentals and temperature during the summer period, but this is particularly visible in the initial graph; yet from this graph there is a distinct difference in the peaks between bike rentals and temperature, suggesting that temperature does not fully explain the variation in bike rental demand. The second graph breaks down the data in 4 segments to get a more precise reading and trend per season, showing a clear and distinct positive relationship in spring and more.
+Although the graphs suggest an association, this does not prove that temperature directly influences bike rental demand as correlation does not imply causation.
 The Pearson correlation coefficient for Figure 1 was calculated to be 0.69982 to 5 significant figures, suggesting a moderately strong linear relationship between the two variables, supporting the relationship deduced from the first graph; however the value is not strong enough for temperature to be the only variable affecting bike rental demand. 
 
 This can be further attested to by the graph below which measures the mean bike count for each temperature group:
@@ -319,9 +319,8 @@ $D_E =$ Estimated Daily Demand
 $T_M =$ Mean Daily Temperature  
 $H_M =$ Mean Daily Humidity  
 $S_H =$ Daily Hours of Sunlight  
-From the equation we can see that the intercept is 5188 which is the expected demand for bikes when mean daily temperature, mean daily humidity and hours of sunlight are all equal to 0. The slope of mean daily temperature is 540, which means that on average as the mean daily temperature increases by one degree celsius, we expect the demand of bikes for that day to increase by 540. The slope of mean daily humidity is -177.7 which means on average as the mean daily humidity increases by one percent, we expect the demand of bikes for that day to decrease by approximately 178. Again, the slope of hours of sunlight is 1236.7 which means on average as the hours of sunlight in a day increases by one hour, we expect the demand of bikes for that day to increase by approximately 1237. From the residual plot we can see a pattern as predicted bike demand increases the residuals increase, implying that the model is not a good fit, additionally they are not randomly scattered around 0; so overall, this model might not be an ideal fit as we cannot accurately estimate the expected daily bike demand as there is a fan shape present in the residual plot which indicates that the assumption of constant variance is violated. 
-
-Further down we explore more models as we try to find one with a suitable fit, so the adjusted R squared value must be used over the R squared value as it considers the number of predictors for complexity’s sake. As a result, the adjusted R squared value for the testing data for this model is 0.638, showing that the selected variables explain roughly 63.8% of the variation in daily demand. Additionally, the RMSE value for the testing data is 6285.3 which represents root mean square error, which can be used through comparison to identify the model with the higher prediction accuracy.
+From the residual plot we can see a pattern as predicted bike demand increases the residuals increase, implying that the model is not a good fit, additionally they are not randomly scattered around 0; so overall, this model might not be an ideal fit as we cannot accurately estimate the expected daily bike demand as there is a fan shape present in the residual plot which indicates that the assumption of constant variance is violated. 
+Further down we explore more models as we try to find one with a suitable fit, so the adjusted R squared value must be used over the R squared value as it considers the number of predictors for complexity’s sake. As a result, the adjusted R squared value for the testing data for this model is 0.638 and the RMSE value for the testing data is 6285.3.
 
 #### 2. Humidity as a Singular Predictor
 
@@ -341,6 +340,15 @@ ggplot(bike_humid_fit_aug, mapping = aes(x = .fitted, y = .resid)) +
 ```
 
 We also modelled the demand using only the humidity variable as a predictor. This gave the following equation:
+
+$$
+D_E = 15764.1 + 16.7H_M
+$$
+
+$D_E =$ Estimated Daily Demand  
+$S_H =$ Mean Daily Humidity 
+
+The R squared value for this model is 0.0007 which is extremely low and shows that this model is not a good fit for predicting bike demand. Comparing the residual plot with the linear graph of humidity against actual daily bike demand we see that there is little to no correlation between the two. This led to the residuals being randomly scattered around zero with no discernible pattern.
 
 
 #### 3. Sunlight as a Singular Predictor
@@ -401,7 +409,7 @@ This model takes into consideration only 2 variables, temperature and hours of s
 
 ### Model Evaluation
 #### Comparing Based on Adjusted R Squared and RMSE
-We can compare models 1 and 4 to find the ideal model to fit our data. Model 1 uses the 3 variables: Temperature, Humidity and Hours of Sunlight, whereas model 4 only uses 3 variables, Temperature and Hours of Sunlight. In model 1, we calculated the adjusted R squared value to be 0.638 for the testing data and the RMSE value to be 6285.3; however in model 4, the adjusted R squared value is calculated to be 0.618 for the testing data and the RMSE value to be 6486.3. The adjusted R squared value is preferred over just the R squared value as it takes into consideration the number of predictors which accounts for complexity. As we compare the adjusted R squared value for both models’ testing data, we can determine that the model 1 may be a more suitable fit as its adjusted R squared value is larger, meaning that it can explain more of the variation in bike demand. Moreover, model 1 has a smaller RMSE value, demonstrating that it has less error and a higher prediction accuracy. Overall, this suggests that model 1 is a much better fit for the data, despite the exploration done in model 2.
+We can compare models 1 and 4 to find the ideal model to fit our data. Model 1 uses the 3 variables: Temperature, Humidity and Hours of Sunlight, whereas model 4 only uses 2 variables, Temperature and Hours of Sunlight. In model 1, we calculated the adjusted R squared value to be 0.638 for the testing data and the RMSE value to be 6285.3; however in model 4, the adjusted R squared value is calculated to be 0.618 for the testing data and the RMSE value to be 6486.3. The adjusted R squared value is preferred over just the R squared value as it takes into consideration the number of predictors which accounts for complexity. As we compare the adjusted R squared value for both models’ testing data, we can determine that the model 1 may be a more suitable fit as its adjusted R squared value is larger, meaning that it can explain more of the variation in bike demand. Moreover, model 1 has a smaller RMSE value, demonstrating that it has less error and a higher prediction accuracy. Overall, this suggests that model 1 is a much better fit for the data, despite the exploration done in model 2.
 
 #### Comparing Based on Cross Validation
 
