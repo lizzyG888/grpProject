@@ -4,7 +4,7 @@ This is a template repository for your group project. One of your group members 
 
 ## Team members
 
-- Ella Hoang-Elcome ( ), ellahoanglcm
+- Ella Hoang-Elcome (s2778286), ellahoanglcm
 - Lizzy Goh (s2952979), lizzyG888
 - Parinoor Sekhon (s2965603), ps-18-6
 
