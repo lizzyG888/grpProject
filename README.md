@@ -6,7 +6,7 @@ This is a template repository for your group project. One of your group members 
 
 - Ella Hoang-Elcome ( ), ellahoanglcm
 - Lizzy Goh (s2952979), lizzyG888
-- Parinoor Sekhon ( ), ps-18-6
+- Parinoor Sekhon (s2965603), ps-18-6
 
 ## Repository structure
 
