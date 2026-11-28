@@ -4,7 +4,7 @@
     <title>Impacts of Weather on Bike Demand in Seoul!</title>
     <meta charset="utf-8" />
     <meta name="author" content="by Group 34: Ella Hoang-Elcome, Lizzy Goh and Parinoor Sekhon" />
-    <meta name="date" content="2026-11-27" />
+    <meta name="date" content="2026-11-28" />
     <script src="libs/header-attrs-2.32/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
@@ -25,7 +25,7 @@ class: center, middle, inverse, title-slide
 ### University of Edinburgh
 ]
 .date[
-### 2026-11-27
+### 2026-11-28
 ]
 
 ---
@@ -42,29 +42,13 @@ class: center, middle, inverse, title-slide
 
 
 
+
+
+
+
 class: center, middle
 
-## A statement of the overall goal / research question
-
----
-
-class: inverse, center, middle
-
-# Section title
-
----
-
-# Hello World
-
-- Click the `Knit` button to compile your presentation
-
-- Make sure to commit and push all resulting files to your GitHub repo
-
----
-
-class: inverse, middle, center
-
-# Using xaringan
+## To what extent can variation in bike demand throughout the year in Seoul be attributed to changes in weather?
 
 ---
 
@@ -77,6 +61,101 @@ class: inverse, middle, center
 --
 
 - Like this
+
+---
+
+# Hello World
+
+- Click the `Knit` button to compile your presentation
+
+- Make sure to commit and push all resulting files to your GitHub repo
+
+---
+
+class: inverse, center, middle
+
+# Data &amp; Variables
+
+---
+
+class: inverse, center, middle
+
+# Visualizations &amp; Exploratory Analysis
+
+---
+
+class: inverse, middle, center
+
+# Single Predictor Models
+
+---
+
+&lt;img src="presentation_files/figure-html/trial 16 - model 1 assessment-1.png" alt="" width="75%" /&gt;
+
+$$
+D_E = 8906.8 + 621.3T_M
+$$
+
+`\(D_E =\)` Estimated Daily Demand  
+`\(T_M =\)` Daily Hours of Sunlight
+
+---
+
+&lt;img src="presentation_files/figure-html/humidity predictor-1.png" alt="" width="75%" /&gt;
+$$
+D_E = 15764.1 + 16.7H_M
+$$
+
+`\(D_E =\)` Estimated Daily Demand  
+`\(H_M =\)` Mean Daily Humidity 
+
+---
+
+&lt;img src="presentation_files/figure-html/sunlight predictor-1.png" alt="" width="80%" /&gt;
+
+---
+
+&lt;img src="presentation_files/figure-html/residual for sunlight-1.png" alt="" width="75%" /&gt;
+
+$$
+D_E = -25387.0 + 3461.6S_H
+$$
+
+`\(D_E =\)` Estimated Daily Demand  
+`\(S_H =\)` Daily Hours of Sunlight
+
+---
+
+class: inverse, middle, center
+
+# Multiple Predictor Models
+
+---
+&lt;img src="presentation_files/figure-html/3 predictors-1.png" alt="" width="65%" /&gt;
+
+$$
+D_E = 5188.0 + 540.0T_M - 177.7H_M + 1236.7S_H
+$$
+Where:  
+`\(D_E =\)` Estimated Daily Demand  
+`\(T_M =\)` Mean Daily Temperature  
+`\(H_M =\)` Mean Daily Humidity  
+`\(S_H =\)` Daily Hours of Sunlight  
+---
+&lt;img src="presentation_files/figure-html/2 predictors-1.png" alt="" width="65%" /&gt;
+
+$$
+D_E = -9860.6 + 368.9T_M + 1799.8S_H
+$$
+Where:  
+`\(D_E =\)` Estimated Daily Demand  
+`\(T_M =\)` Mean Daily Temperature  
+`\(S_H =\)` Daily Hours of Sunlight  
+---
+
+class: inverse, middle, center
+
+# Model Evaluation
 
 ---
 

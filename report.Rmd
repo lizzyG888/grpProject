@@ -288,9 +288,12 @@ df_bike_rain %>% summarise(Correlation = cor(day_bike_count, mean_day_rainfall))
 
 ```
 
-Above, we plotted the graphs for the number of rented bikes in a day and the mean rainfall for that day measured in millimetres. From the graphs it appears that there is no visible relationship between the demand for bikes and rainfall, as the demand rises and falls as rainfall remains almost constant at low levels with few exceptions. This is seen in a low Pearson correlation coefficient of -0.214 which tells us there is a negative and weak relationship between rainfall and bikes demanded. The boxplot below shows that most, if not, all of the non-zero values in the rainfall variable are anomalous, making it almost impossible to make a reliable model to predict bike count from rainfall. Hence, we decided not to include rainfall as a predictor in our models.
+Above, we plotted the graphs for the number of rented bikes in a day and the mean rainfall for that day measured in millimeters. From the graphs it appears that there is no visible relationship between the demand for bikes and rainfall, as the demand rises and falls as rainfall remains almost constant at low levels with few exceptions. This is seen in a low Pearson correlation coefficient of -0.214 which tells us there is a negative and weak relationship between rainfall and bikes demanded. The boxplot below shows that most, if not, all of the non-zero values in the rainfall variable are anomalous, making it almost impossible to make a reliable model to predict bike count from rainfall. Hence, we decided not to include rainfall as a predictor in our models.
 
 ```{r rain boxplot, echo = FALSE}
+
+ggplot(data = df, mapping = aes(x = rainfall_mm))+
+  geom_boxplot()
 ```
 
 ### Modelling:
@@ -346,14 +349,14 @@ D_E = 15764.1 + 16.7H_M
 $$
 
 $D_E =$ Estimated Daily Demand  
-$S_H =$ Mean Daily Humidity 
+$H_M =$ Mean Daily Humidity 
 
 The R squared value for this model is 0.0007 which is extremely low and shows that this model is not a good fit for predicting bike demand. Comparing the residual plot with the linear graph of humidity against actual daily bike demand we see that there is little to no correlation between the two. This led to the residuals being randomly scattered around zero with no discernible pattern.
 
 
 #### 3. Sunlight as a Singular Predictor
 
-```{r sunlight predictor, echo = FALSE}
+```{r sunlight predictor, echo = FALSE, message = FALSE}
 #Creating linear model
 bike_sun_fit <- linear_reg() %>%
   set_engine("lm") %>%
